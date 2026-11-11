@@ -1293,7 +1293,7 @@ function plushFiberPattern(container,id){
 }
 function plushInsetPoints(s){return s.points.map(([x,y])=>(x*.86).toFixed(3)+','+(y*.86).toFixed(3)).join(' ')}
 
-// v9.35: mixed cloth patterns, shared by the live board and artwork SVGs.
+// v9.37: one cloth motif per piece, shared by the live board and artwork SVGs.
 // Texture is a visual choice only: it never changes piece vertices, collision or save data.
 function patchworkMotifDefs(defs,prefix){
  const pattern=(number,w=25,h=25)=>node('pattern',{id:prefix+'PatchMotif'+number,patternUnits:'userSpaceOnUse',width:w,height:h},defs);
@@ -1347,20 +1347,11 @@ function patchworkPanel(b,layout){
   seam:`M ${fmt(top)} ${fmt(y-pad)} L ${fmt(low)} ${fmt(y+h+pad)}`};
 }
 function drawPatchworkPiece(group,s,color,gradientId,prefix,pieceId){
- const pts=polygonPoints(s.id),plan=patchworkPlan(s,pieceId),b=shapeBounds(s);
- // Same plush silhouette and shading; patches are clipped strictly to this polygon.
+ const pts=polygonPoints(s.id),plan=patchworkPlan(s,pieceId);
+ // Same plush silhouette and shading; each piece now carries exactly one cloth motif.
  const face=node('polygon',{points:pts,fill:`url(#${gradientId})`,stroke:tone(color,'black',.16),'stroke-width':1.65,'stroke-linejoin':'round'},group);
  const cloth=node('g',{'clip-path':`url(#${prefix}Clip-${s.id})`},group);
- node('polygon',{points:pts,fill:`url(#${prefix}PatchMotif${plan.first})`,opacity:.9},cloth);
- // Broad fabric inserts are omitted on narrow/small shapes to preserve readability.
- if(Math.min(b.w,b.h)>=34&&b.w*b.h>=1600){
-  const panel=patchworkPanel(b,plan.layout);
-  const accents=['#ffd3d5','#d3f2dd','#f9e8aa','#d3e6fa','#e6d4fa'];
-  node('path',{d:panel.fill,fill:patchworkMix(color,accents[plan.accent],.40),opacity:.79},cloth);
-  node('path',{d:panel.fill,fill:`url(#${prefix}PatchMotif${plan.second})`,opacity:.86},cloth);
-  node('path',{d:panel.seam,fill:'none',stroke:tone(color,'black',.42),'stroke-width':2.7,'stroke-opacity':.24},cloth);
-  node('path',{d:panel.seam,fill:'none',stroke:'#fffaf0','stroke-width':1.35,'stroke-dasharray':'2 3.5','stroke-linecap':'round','stroke-opacity':.94},cloth);
- }
+ node('polygon',{points:pts,fill:`url(#${prefix}PatchMotif${plan.first})`,opacity:.88},cloth);
  // Preserve the v9.34 cushioned rim, fabric fibers and subtle inset stitches.
  node('polygon',{points:pts,fill:'none',stroke:tone(color,'black',.26),'stroke-width':11,'stroke-opacity':.36,'stroke-linejoin':'round'},cloth);
  node('polygon',{points:pts,fill:'none',stroke:tone(color,'white',.78),'stroke-width':6,'stroke-opacity':.63,'stroke-linejoin':'round'},cloth);
@@ -2132,7 +2123,7 @@ function plushAlbumPiece(s,color,id,colorIndex,transform){
   shape+' fill="url(#'+id+'PlushFiber)" opacity=".32"/>'+
   '<polygon points="'+plushInsetPoints(s)+'" fill="none" stroke="'+tone(color,'white',.91)+'" stroke-width="1.35" stroke-opacity=".74" stroke-dasharray="1.8 3.1" stroke-linecap="round" stroke-linejoin="round"/></g></g>';
 }
-// Keep the patchwork in album thumbnails, the full-screen viewer and SVG exports.
+// Keep the single-motif patchwork in album thumbnails, the full-screen viewer and SVG exports.
 // All markup uses the same drawing function and motif definitions as the playing field.
 function patchworkAlbumDefs(colors,types,prefix){
  const defs=node('defs');
