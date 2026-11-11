@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#ffefd5">
-<title>ピタトリエ v9.33 — つくる・ぬる・ひらめく</title>
+<title>ピタトリエ v9.35 — つくる・ぬる・ひらめく</title>
 <style>
 :root{font-family:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;color:#33465b;--ink:#34465b;--soft:#6e7e8e;--peach:#ff8d86;--mint:#7fd3c3;--cream:#fff8ed;--shadow:0 7px 0 #dfd9d0,0 10px 28px #8c85801b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{background:#f8f1e7}body{margin:0;background:radial-gradient(circle at 17% 2%,#ffeadb 0,transparent 31%),radial-gradient(circle at 98% 20%,#e3f7f0 0,transparent 42%),linear-gradient(180deg,#fff9ef,#f9f0e6);min-height:100dvh;overscroll-behavior-y:contain}
@@ -941,7 +941,7 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 <button data-feature="colors"><span class="uiicon icon-palette" aria-hidden="true"></span>カラーセット</button>
 <button data-feature="tools"><span class="uiicon icon-scissors" aria-hidden="true"></span>創作ツール</button>
 </div><p class="tiny">作品も色もこの端末に保存できます。ピースの形は変わりません。</p></section>
-<section class="panel"><h2><span class="uiicon icon-gear" aria-hidden="true"></span>ちいさな せってい</h2><label class="switch"><input id="sound" type="checkbox" checked>ぴたっとくっつく音</label><label class="texture-setting" for="pieceTextureDesktop"><span class="texture-setting-label">ピースのしつかん</span><select id="pieceTextureDesktop" aria-label="ピースのしつかん"><option value="toy">いつもの</option><option value="origami">おりがみ</option></select></label><p class="tiny" style="margin-top:9px">作品はこの端末のブラウザに自動保存されます。インターネット接続なしでも遊べます。</p></section>
+<section class="panel"><h2><span class="uiicon icon-gear" aria-hidden="true"></span>ちいさな せってい</h2><label class="switch"><input id="sound" type="checkbox" checked>ぴたっとくっつく音</label><label class="texture-setting" for="pieceTextureDesktop"><span class="texture-setting-label">ピースのしつかん</span><select id="pieceTextureDesktop" aria-label="ピースのしつかん"><option value="toy">いつもの</option><option value="origami">おりがみ</option><option value="plush">ぬいぐるみ</option><option value="patchwork">パッチワーク</option></select></label><p class="tiny" style="margin-top:9px">作品はこの端末のブラウザに自動保存されます。インターネット接続なしでも遊べます。</p></section>
 </aside>
 </div>
 </div></div>
@@ -972,7 +972,7 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 <button id="mobileMenuOverview">▢ 盤面全体をみる</button>
 <button data-proxy="export"><span class="uiicon icon-camera" aria-hidden="true"></span>画像を保存</button>
 </div>
-<div class="sheet-section"><label class="switch"><input id="mobileGuide" type="checkbox" checked>おてほんの形を表示</label><label class="switch"><input id="mobileSound" type="checkbox" checked>ぴたっとくっつく音</label><label class="texture-setting" for="pieceTextureMobile"><span class="texture-setting-label">ピースのしつかん</span><select id="pieceTextureMobile" aria-label="ピースのしつかん"><option value="toy">いつもの</option><option value="origami">おりがみ</option></select></label></div>
+<div class="sheet-section"><label class="switch"><input id="mobileGuide" type="checkbox" checked>おてほんの形を表示</label><label class="switch"><input id="mobileSound" type="checkbox" checked>ぴたっとくっつく音</label><label class="texture-setting" for="pieceTextureMobile"><span class="texture-setting-label">ピースのしつかん</span><select id="pieceTextureMobile" aria-label="ピースのしつかん"><option value="toy">いつもの</option><option value="origami">おりがみ</option><option value="plush">ぬいぐるみ</option><option value="patchwork">パッチワーク</option></select></label></div>
 <details class="menu-help"><summary><span class="uiicon icon-bulb" aria-hidden="true"></span>操作のヒントを見る</summary><div class="menu-help-body"><p>小さいピースは約0.3秒長押しすると、指で隠さずに動かせます。選択中の「<span class="uiicon icon-search" aria-hidden="true"></span>近づく」で拡大できます。</p><p>空白を1本指でなぞると盤面を移動、2本指で拡大・縮小できます。作品は自動保存されます。</p></div></details>
 </section>
 
@@ -1185,9 +1185,9 @@ const PAINT_COLORS=[
 const PAINT_BY_ID=Object.fromEntries(PAINT_COLORS.map(c=>[c.id,c]));
 // Material style is a local display preference, independent from piece color and geometry.
 const PIECE_TEXTURE_PREF='pitatorie_piece_texture_v1';
-const PIECE_TEXTURE_CHOICES=['toy','origami'];
+const PIECE_TEXTURE_CHOICES=['toy','origami','plush','patchwork'];
 let pieceTexture='toy';
-// 以前の質感（木・ガラス・ジュエル）を選んでいた端末も「いつもの」に戻す。
+// 以前の廃止された質感（木・ガラス・ジュエル）を選んでいた端末は「いつもの」に戻す。
 try{const savedTexture=localStorage.getItem(PIECE_TEXTURE_PREF);if(PIECE_TEXTURE_CHOICES.includes(savedTexture)){pieceTexture=savedTexture}else if(savedTexture!==null){localStorage.setItem(PIECE_TEXTURE_PREF,'toy')}}catch(_){}
 function setPieceTexture(value){
  pieceTexture=PIECE_TEXTURE_CHOICES.includes(value)?value:'toy';
@@ -1200,6 +1200,7 @@ let paintingActive=false,paintSelectedId='coral',paintAction='one',paintExpanded
 try{const d=JSON.parse(localStorage.getItem(PAINT_PREF)||'{}');if(PAINT_BY_ID[d.selected])paintSelectedId=d.selected;if(Array.isArray(d.recent))paintRecent=[...new Set(d.recent.filter(x=>PAINT_BY_ID[x]))].slice(0,8)}catch(_){}
 function buildPaintMaterialDefs(container){
  for(const c of PAINT_COLORS){
+  plushGradient(container,'paintPlush-'+c.id,c.hex);
   jewelGradient(container,'paintJewel-'+c.id,c.hex);
   const face=node('linearGradient',{id:'paintFace-'+c.id,x1:'0%',y1:'0%',x2:'87%',y2:'100%'},container);
   for(const [offset,color] of [['0%',tone(c.hex,'white',.37)],['27%',tone(c.hex,'white',.19)],['61%',c.hex],['84%',tone(c.hex,'black',.09)],['100%',tone(c.hex,'black',.22)]])node('stop',{offset,'stop-color':color},face);
@@ -1277,6 +1278,97 @@ function tone(hex,mix,ratio){
  return '#'+rgb.map((v,i)=>Math.round(v*(1-ratio)+dest[i]*ratio).toString(16).padStart(2,'0')).join('');
 }
 function shapeBounds(s){const xs=s.points.map(q=>q[0]),ys=s.points.map(q=>q[1]);return {x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)}}
+// Soft stuffed-toy texture: no change to collision vertices, angles or snapping.
+// Color identity is retained; gentle shading and tiny fabric marks are layered inside each polygon.
+function plushStops(hex){return [['0%',tone(hex,'white',.34)],['35%',tone(hex,'white',.15)],['66%',hex],['86%',tone(hex,'black',.045)],['100%',tone(hex,'black',.23)]]}
+function plushGradient(container,id,hex){
+ const grad=node('radialGradient',{id,cx:'37%',cy:'25%',r:'83%',fx:'32%',fy:'19%'},container);
+ for(const [offset,color] of plushStops(hex))node('stop',{offset,'stop-color':color},grad);
+}
+// Shared tiny herringbone textile strokes; no costly noise filter, shadows or animation.
+function plushFiberPattern(container,id){
+ const pat=node('pattern',{id,patternUnits:'userSpaceOnUse',width:14,height:14},container);
+ node('path',{d:'M 1 3 l 2 1 M 8 1 l 2 1 M 4 9 l 2 1 M 11 10 l 2 1',fill:'none',stroke:'#fff','stroke-width':.7,'stroke-linecap':'round','stroke-opacity':.7},pat);
+ node('path',{d:'M 4 4 l 1.5 -1 M 11 6 l 1.5 -1 M 1 12 l 1.5 -1',fill:'none',stroke:'#65443c','stroke-width':.5,'stroke-linecap':'round','stroke-opacity':.25},pat);
+}
+function plushInsetPoints(s){return s.points.map(([x,y])=>(x*.86).toFixed(3)+','+(y*.86).toFixed(3)).join(' ')}
+
+// v9.35: mixed cloth patterns, shared by the live board and artwork SVGs.
+// Texture is a visual choice only: it never changes piece vertices, collision or save data.
+function patchworkMotifDefs(defs,prefix){
+ const pattern=(number,w=25,h=25)=>node('pattern',{id:prefix+'PatchMotif'+number,patternUnits:'userSpaceOnUse',width:w,height:h},defs);
+ let p=pattern(0,24,24); // polka dots
+ node('circle',{cx:7,cy:7,r:3.1,fill:'#fff','fill-opacity':.83},p);
+ node('circle',{cx:19,cy:19,r:2.6,fill:'#583d53','fill-opacity':.24},p);
+ p=pattern(1,22,22); // gingham
+ node('rect',{x:0,y:0,width:9,height:22,fill:'#fff','fill-opacity':.26},p);
+ node('rect',{x:0,y:0,width:22,height:9,fill:'#fff','fill-opacity':.27},p);
+ node('rect',{x:0,y:0,width:9,height:9,fill:'#fff','fill-opacity':.19},p);
+ node('path',{d:'M0 11 H22 M11 0 V22',stroke:'#61475c','stroke-width':.7,'stroke-opacity':.16},p);
+ p=pattern(2,26,26); // candy stripes
+ node('path',{d:'M-13 13 L13 -13 M0 26 L26 0 M13 39 L39 13',stroke:'#fff','stroke-width':5,'stroke-opacity':.53},p);
+ node('path',{d:'M-6 26 L20 0 M7 39 L33 13',stroke:'#5c455b','stroke-width':1.2,'stroke-opacity':.23},p);
+ p=pattern(3,30,30); // daisies
+ for(let a=0;a<5;a++){const t=a*Math.PI*2/5;node('circle',{cx:15+Math.cos(t)*4.1,cy:15+Math.sin(t)*4.1,r:3.35,fill:'#fff','fill-opacity':.85},p)}
+ node('circle',{cx:15,cy:15,r:2.45,fill:'#f7cf81','fill-opacity':.94},p);
+ node('circle',{cx:2,cy:3,r:1.35,fill:'#fff','fill-opacity':.49},p);
+ p=pattern(4,29,29); // five-point stars
+ node('polygon',{points:'14.5,4 17.5,11.1 25,11.3 19,16.4 21.2,23.6 14.5,19.4 7.8,23.6 10,16.4 4,11.3 11.5,11.1',fill:'#fff','fill-opacity':.78},p);
+ p=pattern(5,29,29); // tiny hearts
+ node('path',{d:'M14.5 23 C12 20 5.4 15.2 5.4 10.6 C5.4 4.8 12.2 4.4 14.5 9 C16.8 4.4 23.6 4.8 23.6 10.6 C23.6 15.2 17 20 14.5 23 Z',fill:'#fff','fill-opacity':.76},p);
+ p=pattern(6,30,25); // wavy woven ribbon
+ node('path',{d:'M-4 6 Q3 0 11 6 T26 6 T41 6 M-4 17 Q3 11 11 17 T26 17 T41 17',stroke:'#fff','stroke-width':2.8,'stroke-linecap':'round','stroke-opacity':.62,fill:'none'},p);
+ node('path',{d:'M-4 11 Q3 5 11 11 T26 11 T41 11',stroke:'#68425c','stroke-width':1.2,'stroke-opacity':.19,fill:'none'},p);
+ p=pattern(7,26,26); // embroidered crosses
+ node('path',{d:'M5 5 l6 6 M11 5 l-6 6 M18 18 l5 5 M23 18 l-5 5',stroke:'#fff','stroke-width':2,'stroke-linecap':'round','stroke-opacity':.80,fill:'none'},p);
+ node('circle',{cx:19,cy:5,r:1.7,fill:'#5d4658','fill-opacity':.25},p);
+}
+function patchworkPlan(s,id){
+ const shapeSeed=Array.from(s.id).reduce((v,ch)=>Math.imul(v,31)+ch.charCodeAt(0)|0,0);
+ const n=(Math.imul((Number(id)||0)|0,0x9e3779b1)^Math.imul(shapeSeed,0x85ebca6b))>>>0;
+ const first=n%8;
+ return {first,second:(first+1+((n>>>8)%7))%8,layout:(n>>>15)%3,accent:(n>>>19)%5};
+}
+function patchworkMix(a,b,ratio){
+ const aa=a.replace('#',''),bb=b.replace('#','');
+ return '#'+[0,2,4].map(k=>Math.round(parseInt(aa.slice(k,k+2),16)*(1-ratio)+parseInt(bb.slice(k,k+2),16)*ratio).toString(16).padStart(2,'0')).join('');
+}
+function patchworkPanel(b,layout){
+ const x=b.x,y=b.y,w=b.w,h=b.h,pad=10;
+ const fmt=v=>Number(v.toFixed(2));
+ if(layout===0){const top=x+w*.37,low=x+w*.66;return {
+  fill:`M ${fmt(top)} ${fmt(y-pad)} L ${fmt(x+w+pad)} ${fmt(y-pad)} L ${fmt(x+w+pad)} ${fmt(y+h+pad)} L ${fmt(low)} ${fmt(y+h+pad)} Z`,
+  seam:`M ${fmt(top)} ${fmt(y-pad)} L ${fmt(low)} ${fmt(y+h+pad)}`};}
+ if(layout===1){const l=y+h*.40,r=y+h*.66;return {
+  fill:`M ${fmt(x-pad)} ${fmt(l)} L ${fmt(x+w+pad)} ${fmt(r)} L ${fmt(x+w+pad)} ${fmt(y+h+pad)} L ${fmt(x-pad)} ${fmt(y+h+pad)} Z`,
+  seam:`M ${fmt(x-pad)} ${fmt(l)} L ${fmt(x+w+pad)} ${fmt(r)}`};}
+ const top=x+w*.64,low=x+w*.35;return {
+  fill:`M ${fmt(x-pad)} ${fmt(y-pad)} L ${fmt(top)} ${fmt(y-pad)} L ${fmt(low)} ${fmt(y+h+pad)} L ${fmt(x-pad)} ${fmt(y+h+pad)} Z`,
+  seam:`M ${fmt(top)} ${fmt(y-pad)} L ${fmt(low)} ${fmt(y+h+pad)}`};
+}
+function drawPatchworkPiece(group,s,color,gradientId,prefix,pieceId){
+ const pts=polygonPoints(s.id),plan=patchworkPlan(s,pieceId),b=shapeBounds(s);
+ // Same plush silhouette and shading; patches are clipped strictly to this polygon.
+ const face=node('polygon',{points:pts,fill:`url(#${gradientId})`,stroke:tone(color,'black',.16),'stroke-width':1.65,'stroke-linejoin':'round'},group);
+ const cloth=node('g',{'clip-path':`url(#${prefix}Clip-${s.id})`},group);
+ node('polygon',{points:pts,fill:`url(#${prefix}PatchMotif${plan.first})`,opacity:.9},cloth);
+ // Broad fabric inserts are omitted on narrow/small shapes to preserve readability.
+ if(Math.min(b.w,b.h)>=34&&b.w*b.h>=1600){
+  const panel=patchworkPanel(b,plan.layout);
+  const accents=['#ffd3d5','#d3f2dd','#f9e8aa','#d3e6fa','#e6d4fa'];
+  node('path',{d:panel.fill,fill:patchworkMix(color,accents[plan.accent],.40),opacity:.79},cloth);
+  node('path',{d:panel.fill,fill:`url(#${prefix}PatchMotif${plan.second})`,opacity:.86},cloth);
+  node('path',{d:panel.seam,fill:'none',stroke:tone(color,'black',.42),'stroke-width':2.7,'stroke-opacity':.24},cloth);
+  node('path',{d:panel.seam,fill:'none',stroke:'#fffaf0','stroke-width':1.35,'stroke-dasharray':'2 3.5','stroke-linecap':'round','stroke-opacity':.94},cloth);
+ }
+ // Preserve the v9.34 cushioned rim, fabric fibers and subtle inset stitches.
+ node('polygon',{points:pts,fill:'none',stroke:tone(color,'black',.26),'stroke-width':11,'stroke-opacity':.36,'stroke-linejoin':'round'},cloth);
+ node('polygon',{points:pts,fill:'none',stroke:tone(color,'white',.78),'stroke-width':6,'stroke-opacity':.63,'stroke-linejoin':'round'},cloth);
+ node('polygon',{points:pts,fill:`url(#${prefix}PlushFiber)`,opacity:.32},cloth);
+ node('polygon',{points:plushInsetPoints(s),fill:'none',stroke:tone(color,'white',.91),'stroke-width':1.35,'stroke-opacity':.74,'stroke-dasharray':'1.8 3.1','stroke-linecap':'round','stroke-linejoin':'round'},cloth);
+ return face;
+}
+
 // v9.32: jewel finish, applied only to the displayed face of each piece.
 // Retain the original base hue (including the selected color palette and 24 paint colors).
 function jewelBright(hex){const h=hex.replace('#','');const v=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2]}
@@ -1305,6 +1397,9 @@ function jewelShinePath(s){
 }
 function jewelSparkle(s){const b=shapeBounds(s);return {x:b.x+b.w*.70,y:b.y+b.h*.65,size:Math.min(3.6,Math.max(1.4,Math.min(b.w,b.h)*.074))}}
 function buildMaterialDefs(container,shapes,prefix){
+ // Shared lightweight textile pattern and gradients; no visual change to piece geometry.
+ plushFiberPattern(container,prefix+'PlushFiber');
+ patchworkMotifDefs(container,prefix);
  // One shared lightweight wood grain and glass sheen for all pieces. No filters or raster images.
  const grain=node('pattern',{id:'woodGrain',patternUnits:'userSpaceOnUse',width:66,height:58},container);
  node('path',{d:'M -8 8 C 8 2, 22 17, 38 9 S 58 4, 75 11 M -10 25 C 9 17, 22 35, 39 26 S 60 20, 77 29 M -9 44 C 7 37, 22 54, 42 45 S 63 42, 77 47',fill:'none',stroke:'#754c35','stroke-width':1.15,'stroke-opacity':.18},grain);
@@ -1313,6 +1408,7 @@ function buildMaterialDefs(container,shapes,prefix){
  for(const [offset,opacity] of [['0%',.48],['22%',.28],['41%',.05],['58%',0],['81%',.06],['100%',.24]])node('stop',{offset,'stop-color':'#fff','stop-opacity':opacity},glass);
  jewelCommonDefs(container,prefix);
  for(const s of shapes){
+  plushGradient(container,`${prefix}Plush-${s.id}`,s.color);
   jewelGradient(container,`${prefix}Jewel-${s.id}`,s.color);
   const base=node('linearGradient',{id:`${prefix}Face-${s.id}`,x1:'0%',y1:'0%',x2:'87%',y2:'100%'},container);
   for(const [offset,color] of [['0%',tone(s.color,'white',.37)],['27%',tone(s.color,'white',.19)],['61%',s.color],['84%',tone(s.color,'black',.09)],['100%',tone(s.color,'black',.22)]])node('stop',{offset,'stop-color':color},base);
@@ -1334,6 +1430,22 @@ function drawPiece(g,p,selectedFlag=false,ghost=false,groupMarked=false,prefix='
  // Keep selection/group highlights and the drag-only lift shadow handled by paintPiece().
  if(pieceTexture==='origami'){
   return node('polygon',{points:pts,fill:baseColor,stroke:tone(baseColor,'black',.32),'stroke-width':1.8,'stroke-linejoin':'round'},g);
+ }
+ if(pieceTexture==='patchwork'){
+  const plushId=tint?'paintPlush-'+tint.id:`${prefix}Plush-${s.id}`;
+  return drawPatchworkPiece(g,s,baseColor,plushId,prefix,p.id);
+ }
+ if(pieceTexture==='plush'){
+  const plushId=tint?'paintPlush-'+tint.id:`${prefix}Plush-${s.id}`;
+  const face=node('polygon',{points:pts,fill:`url(#${plushId})`,stroke:tone(baseColor,'black',.16),'stroke-width':1.65,'stroke-linejoin':'round'},g);
+  // Soft rim is clipped inside the exact collision shape. Static pieces cast no additional shadow.
+  const cushion=node('g',{'clip-path':`url(#${prefix}Clip-${s.id})`},g);
+  node('polygon',{points:pts,fill:'none',stroke:tone(baseColor,'black',.26),'stroke-width':11,'stroke-opacity':.36,'stroke-linejoin':'round'},cushion);
+  node('polygon',{points:pts,fill:'none',stroke:tone(baseColor,'white',.78),'stroke-width':6,'stroke-opacity':.63,'stroke-linejoin':'round'},cushion);
+  node('polygon',{points:pts,fill:`url(#${prefix}PlushFiber)`,opacity:.32},cushion);
+  // Interior stitched seam; its path is inset to avoid altering how neighboring edges meet.
+  const stitch=node('polygon',{points:plushInsetPoints(s),fill:'none',stroke:tone(baseColor,'white',.91),'stroke-width':1.35,'stroke-opacity':.74,'stroke-dasharray':'1.8 3.1','stroke-linecap':'round','stroke-linejoin':'round'},cushion);
+  return face;
  }
  if(pieceTexture==='wood'){
   const face=node('polygon',{points:pts,fill:tone(baseColor,'white',.07),stroke:tone(baseColor,'black',.34),'stroke-width':2.3,'stroke-linejoin':'round'},g);
@@ -1982,16 +2094,52 @@ function jewelAlbumPiece(s,color,tid,index,transform){
  '<path d="M '+(sp.x-sp.size*1.7)+' '+sp.y+' L '+(sp.x+sp.size*1.7)+' '+sp.y+' M '+sp.x+' '+(sp.y-sp.size*1.7)+' L '+sp.x+' '+(sp.y+sp.size*1.7)+'" stroke="#fff" stroke-width="'+Math.max(.85,sp.size*.55)+'" stroke-linecap="round" stroke-opacity=".65" fill="none"/>'}
  return '<g'+transform+'><polygon points="'+pts+'" fill="url(#'+tid+'J'+index+')" stroke="'+tone(color,'black',.52)+'" stroke-width="3.8" stroke-linejoin="round"/><g clip-path="url(#'+tid+'Clip-'+s.id+')">'+inside+'</g></g>';
 }
+// The album and full-screen viewer use the same pastel plush palette as the live board.
+// IDs are scoped to each artwork SVG so multiple thumbnails never clash.
+function plushAlbumDefs(colors,types,id){
+ const fibers=id+'PlushFiber';
+ const pattern='<pattern id="'+fibers+'" patternUnits="userSpaceOnUse" width="14" height="14"><path d="M 1 3 l 2 1 M 8 1 l 2 1 M 4 9 l 2 1 M 11 10 l 2 1" fill="none" stroke="#fff" stroke-width=".7" stroke-linecap="round" stroke-opacity=".7"/><path d="M 4 4 l 1.5 -1 M 11 6 l 1.5 -1 M 1 12 l 1.5 -1" fill="none" stroke="#65443c" stroke-width=".5" stroke-linecap="round" stroke-opacity=".25"/></pattern>';
+ const gradients=colors.map((color,i)=>'<radialGradient id="'+id+'Plush-'+i+'" cx="37%" cy="25%" r="83%" fx="32%" fy="19%">'+plushStops(color).map(([offset,c])=>'<stop offset="'+offset+'" stop-color="'+c+'"/>').join('')+'</radialGradient>').join('');
+ const clips=types.map(type=>'<clipPath id="'+id+'Clip-'+type+'"><polygon points="'+polygonPoints(type)+'"/></clipPath>').join('');
+ return '<defs>'+pattern+gradients+clips+'</defs>';
+}
+function plushAlbumPiece(s,color,id,colorIndex,transform){
+ const shape='<polygon points="'+polygonPoints(s.id)+'"',clip='url(#'+id+'Clip-'+s.id+')';
+ return '<g'+transform+'>'+shape+' fill="url(#'+id+'Plush-'+colorIndex+')" stroke="'+tone(color,'black',.16)+'" stroke-width="1.65" stroke-linejoin="round"/>'+
+  '<g clip-path="'+clip+'">'+shape+' fill="none" stroke="'+tone(color,'black',.26)+'" stroke-width="11" stroke-opacity=".36" stroke-linejoin="round"/>'+
+  shape+' fill="none" stroke="'+tone(color,'white',.78)+'" stroke-width="6" stroke-opacity=".63" stroke-linejoin="round"/>'+
+  shape+' fill="url(#'+id+'PlushFiber)" opacity=".32"/>'+
+  '<polygon points="'+plushInsetPoints(s)+'" fill="none" stroke="'+tone(color,'white',.91)+'" stroke-width="1.35" stroke-opacity=".74" stroke-dasharray="1.8 3.1" stroke-linecap="round" stroke-linejoin="round"/></g></g>';
+}
+// Keep the patchwork in album thumbnails, the full-screen viewer and SVG exports.
+// All markup uses the same drawing function and motif definitions as the playing field.
+function patchworkAlbumDefs(colors,types,prefix){
+ const defs=node('defs');
+ plushFiberPattern(defs,prefix+'PlushFiber');
+ patchworkMotifDefs(defs,prefix);
+ colors.forEach((c,i)=>plushGradient(defs,prefix+'Plush-'+i,c));
+ for(const type of types){const clip=node('clipPath',{id:prefix+'Clip-'+type,clipPathUnits:'userSpaceOnUse'},defs);node('polygon',{points:polygonPoints(type)},clip)}
+ return defs.outerHTML;
+}
+function patchworkAlbumPiece(s,color,prefix,index,transform,pieceId){
+ const g=node('g',{transform:transform.slice(' transform="'.length,-1)});
+ drawPatchworkPiece(g,s,color,prefix+'Plush-'+index,prefix,pieceId);
+ return g.outerHTML;
+}
 function artSvg(a){const th=themeObject(a.theme);const b=boundsFor(a.boardSize||'medium');const list=a.pieces.slice(0,TOTAL_PIECES).filter(p=>SHAPE[p.type]);
  const tid='artmat'+(++artworkMaterialSeq),woodId=tid+'Wood',glassId=tid+'Glass';
  const jewelColors=[...new Set(list.map(p=>{const sh=SHAPE[p.type],n=SHAPES.findIndex(q=>q.id===p.type);return PAINT_BY_ID[p.paintId]?.hex||th.colors[n]||DEFAULT_COLORS[sh.id]}))];
  const jewelTypes=[...new Set(list.map(p=>p.type))];
  const jewelColorIndex=new Map(jewelColors.map((c,i)=>[c,i]));
- const defs=pieceTexture==='jewel'?jewelAlbumDefs(jewelColors,jewelTypes,tid):
+ const defs=pieceTexture==='patchwork'?patchworkAlbumDefs(jewelColors,jewelTypes,tid):
+  pieceTexture==='plush'?plushAlbumDefs(jewelColors,jewelTypes,tid):
+ pieceTexture==='jewel'?jewelAlbumDefs(jewelColors,jewelTypes,tid):
  pieceTexture==='wood'?'<defs><pattern id="'+woodId+'" patternUnits="userSpaceOnUse" width="66" height="58"><path d="M -8 8 C 8 2,22 17,38 9 S 58 4,75 11 M -10 25 C 9 17,22 35,39 26 S 60 20,77 29 M -9 44 C 7 37,22 54,42 45 S 63 42,77 47" fill="none" stroke="#754c35" stroke-width="1.15" stroke-opacity=".18"/><path d="M -5 14 Q 15 8,33 15 T 72 16 M -5 33 Q 15 27,34 34 T 73 35 M -5 52 Q 15 46,33 53 T 72 54" fill="none" stroke="#fff" stroke-width="1.3" stroke-opacity=".21"/></pattern></defs>':
  pieceTexture==='glass'?'<defs><linearGradient id="'+glassId+'" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity=".48"/><stop offset="22%" stop-color="#fff" stop-opacity=".28"/><stop offset="41%" stop-color="#fff" stop-opacity=".05"/><stop offset="58%" stop-color="#fff" stop-opacity="0"/><stop offset="81%" stop-color="#fff" stop-opacity=".06"/><stop offset="100%" stop-color="#fff" stop-opacity=".24"/></linearGradient></defs>':'';
  const content=list.map(p=>{const s=SHAPE[p.type],n=SHAPES.findIndex(x=>x.id===p.type),color=PAINT_BY_ID[p.paintId]?.hex||th.colors[n]||DEFAULT_COLORS[s.id];
  const shape='<polygon points="'+polygonPoints(s.id)+'"',transform=' transform="translate('+Number(p.x)+' '+Number(p.y)+') rotate('+Number(p.rot||0)+')"';
+ if(pieceTexture==='patchwork')return patchworkAlbumPiece(s,color,tid,jewelColorIndex.get(color),transform,p.id);
+  if(pieceTexture==='plush')return plushAlbumPiece(s,color,tid,jewelColorIndex.get(color),transform);
  if(pieceTexture==='jewel')return jewelAlbumPiece(s,color,tid,jewelColorIndex.get(color),transform);
  if(pieceTexture==='wood')return '<g'+transform+'>'+shape+' fill="'+tone(color,'white',.07)+'" stroke="'+tone(color,'black',.34)+'" stroke-width="2.3" stroke-linejoin="round"/>'+shape+' fill="url(#'+woodId+')" stroke="none"/></g>';
  if(pieceTexture==='glass')return '<g'+transform+'>'+shape+' fill="'+color+'" stroke="'+tone(color,'black',.42)+'" stroke-width="3.4" stroke-linejoin="round"/>'+shape+' fill="url(#'+glassId+')" stroke="none"/>'+shape+' fill="none" stroke="#fff" stroke-opacity=".34" stroke-width="1.8" stroke-linejoin="round"/></g>';
