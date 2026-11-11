@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#ffefd5">
-<title>ピタトリエ v9.27 — つくる・ぬる・ひらめく</title>
+<title>ピタトリエ v9.33 — つくる・ぬる・ひらめく</title>
 <style>
 :root{font-family:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;color:#33465b;--ink:#34465b;--soft:#6e7e8e;--peach:#ff8d86;--mint:#7fd3c3;--cream:#fff8ed;--shadow:0 7px 0 #dfd9d0,0 10px 28px #8c85801b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{background:#f8f1e7}body{margin:0;background:radial-gradient(circle at 17% 2%,#ffeadb 0,transparent 31%),radial-gradient(circle at 98% 20%,#e3f7f0 0,transparent 42%),linear-gradient(180deg,#fff9ef,#f9f0e6);min-height:100dvh;overscroll-behavior-y:contain}
@@ -810,6 +810,13 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
  .boardtitle{flex-basis:14px;min-height:14px}
 }
 
+/* v9.32: album origin filter; only within the album dialog, never the board. */
+.album-kind-filter{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:11px 0 9px}
+.album-kind-filter button{min-width:0;min-height:46px;border:2px solid #e7c797;border-radius:12px;padding:9px 5px;background:#fffef8;color:#835539;font:inherit;font-size:13px;font-weight:900;line-height:1.3;text-align:center;cursor:pointer}
+.album-kind-filter button[aria-pressed="true"]{background:#ddf0d2;border-color:#8dbb78;color:#456f39;box-shadow:inset 0 0 0 1px #ffffffa0}
+.album-kind-filter button:focus-visible{outline:3px solid #d9905a;outline-offset:2px}
+@media(max-width:360px){.album-kind-filter{gap:5px}.album-kind-filter button{font-size:12px;padding:8px 2px;min-height:46px}}
+
 /* v9.22: album favorite filter illustration and text spacing */
 #albumFavOnly{display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;line-height:1.3}
 #albumFavOnly .icon-heart{width:25px;height:25px;min-width:25px;flex:none;margin:0;background-size:contain;background-position:center;background-repeat:no-repeat}
@@ -1039,13 +1046,15 @@ const SHAPES=[
  {id:'tall',name:'たてなが',max:32,color:'#789ed9',spec:'1.25 × 2.5cm',points:[[-UNIT/4,-UNIT/2],[UNIT/4,-UNIT/2],[UNIT/4,UNIT/2],[-UNIT/4,UNIT/2]]},
  // 底辺54＝ろっかくの一辺、ほかの2辺108＝ろっかくの一辺54の2倍。
  // 底辺の半分27から高さを計算し、図形の重心を原点にする（各辺54,108,108）。
- {id:'thintri',name:'ほそさんかく',max:40,color:'#f18d73',spec:'底辺2.5cm・ほかの2辺5.0cm',points:(()=>{const halfBase=UNIT/2,h=Math.sqrt((2*UNIT)**2-halfBase**2);return [[-halfBase,h/3],[halfBase,h/3],[0,-2*h/3]]})()}
+ {id:'thintri',name:'ほそさんかく',max:40,color:'#f18d73',spec:'底辺2.5cm・ほかの2辺5.0cm',points:(()=>{const halfBase=UNIT/2,h=Math.sqrt((2*UNIT)**2-halfBase**2);return [[-halfBase,h/3],[halfBase,h/3],[0,-2*h/3]]})()},
+ // 半円。底辺（直径）54＝ろっかくの一辺。曲線は多角形で近似し、重心を原点にそろえる。
+ {id:'semi',name:'はんえん',max:32,color:'#7db6f1',spec:'底辺2.5cmの半円',points:(()=>{const r=UNIT/2,cy=4*r/(3*Math.PI),steps=20,pts=[];for(let i=0;i<=steps;i++){const t=Math.PI-(Math.PI*i/steps);pts.push([r*Math.cos(t),r*Math.sin(t)-cy])}return pts})()}
 ];
 // すべて反時計回りの頂点列にそろえる。辺の外側へ新しいピースを接続するため。
 for(const shape of SHAPES){const v=shape.points;if(v.reduce((sum,p,i)=>sum+p[0]*v[(i+1)%v.length][1]-v[(i+1)%v.length][0]*p[1],0)<0)v.reverse()}
 const SHAPE=Object.fromEntries(SHAPES.map(s=>[s.id,s]));
 const TOTAL_PIECES=SHAPES.reduce((sum,shape)=>sum+shape.max,0);
-const edgeList=(points,kind)=>points.map((a,i)=>[a,points[(i+1)%points.length],i]).filter(([a,b,i])=>kind!=='fan'||i===0||i===points.length-1);
+const edgeList=(points,kind)=>points.map((a,i)=>[a,points[(i+1)%points.length],i]).filter(([a,b,i])=>{if(kind==='fan')return i===0||i===points.length-1; if(kind==='semi')return i===points.length-1; return true});
 function attachExact(parent,type,parentEdge,childEdge=0,slot=0){
  const pp=rotatePoints(parent.type,parent.rot,parent.x,parent.y), pe=edgeList(pp,parent.type)[parentEdge];
  const cc=SHAPE[type].points,ce=edgeList(cc,type)[childEdge];if(!pe||!ce)throw Error('bad edge index '+type);
@@ -1157,11 +1166,11 @@ const $=id=>document.getElementById(id),svg=$('board'),layer=$('piecesLayer'),ta
 const THEME_STORE='pitatorie_theme_v8',ALBUM_STORE='pitatorie_album_v8';
 const DEFAULT_COLORS=Object.fromEntries(SHAPES.map(s=>[s.id,s.color]));
 const THEMES=[
- {id:'classic',name:'いつものおもちゃ',desc:'今までのカラフルなピース',colors:['#8064c7','#378bbd','#f9c943','#ee6767','#b9e64f','#f4a13f','#4db8b8','#49a87a','#f08bb0','#789ed9','#f18d73']},
- {id:'pastel',name:'ふんわりパステル',desc:'やわらかな絵本の色',colors:['#bca9ed','#91c9eb','#ffe49b','#f2a8b7','#c9eba3','#f8c79a','#a4ded5','#a6d2b6','#f2b6d0','#b2c8eb','#f8baa5']},
- {id:'candy',name:'キャンディポップ',desc:'元気で甘いお菓子の色',colors:['#b066e7','#26b1e0','#ffda36','#ff6199','#9ce13d','#ffa047','#32cfc4','#5cc26b','#ff6bb6','#6e8fea','#ff8869']},
- {id:'jewel',name:'きらめきジュエル',desc:'深みのある宝石カラー',colors:['#7345b6','#2369b3','#f5b82c','#d74f74','#78b849','#db8b29','#238f9d','#268168','#c54d88','#5478ce','#cf6a55']},
- {id:'wood',name:'ぬくもりウッド',desc:'あたたかな木の玩具カラー',colors:['#a07a9f','#849faf','#cfa35d','#c98b80','#a0b081','#c69066','#7caeaa','#85976a','#b88598','#8197b1','#bd8b73']}
+ {id:'classic',name:'いつものおもちゃ',desc:'今までのカラフルなピース',colors:['#8064c7','#378bbd','#f9c943','#ee6767','#b9e64f','#f4a13f','#4db8b8','#49a87a','#f08bb0','#789ed9','#f18d73','#7db6f1']},
+ {id:'pastel',name:'ふんわりパステル',desc:'やわらかな絵本の色',colors:['#bca9ed','#91c9eb','#ffe49b','#f2a8b7','#c9eba3','#f8c79a','#a4ded5','#a6d2b6','#f2b6d0','#b2c8eb','#f8baa5','#baddf3']},
+ {id:'candy',name:'キャンディポップ',desc:'元気で甘いお菓子の色',colors:['#b066e7','#26b1e0','#ffda36','#ff6199','#9ce13d','#ffa047','#32cfc4','#5cc26b','#ff6bb6','#6e8fea','#ff8869','#45c8ef']},
+ {id:'jewel',name:'きらめきジュエル',desc:'深みのある宝石カラー',colors:['#7345b6','#2369b3','#f5b82c','#d74f74','#78b849','#db8b29','#238f9d','#268168','#c54d88','#5478ce','#cf6a55','#377cbb']},
+ {id:'wood',name:'ぬくもりウッド',desc:'あたたかな木の玩具カラー',colors:['#a07a9f','#849faf','#cfa35d','#c98b80','#a0b081','#c69066','#7caeaa','#85976a','#b88598','#8197b1','#bd8b73','#94b0b9']}
 ];
 
 // Paint colors are optional piece properties, independent from the 5 default shape themes.
@@ -1176,10 +1185,12 @@ const PAINT_COLORS=[
 const PAINT_BY_ID=Object.fromEntries(PAINT_COLORS.map(c=>[c.id,c]));
 // Material style is a local display preference, independent from piece color and geometry.
 const PIECE_TEXTURE_PREF='pitatorie_piece_texture_v1';
+const PIECE_TEXTURE_CHOICES=['toy','origami'];
 let pieceTexture='toy';
-try{if(localStorage.getItem(PIECE_TEXTURE_PREF)==='origami')pieceTexture='origami'}catch(_){}
+// 以前の質感（木・ガラス・ジュエル）を選んでいた端末も「いつもの」に戻す。
+try{const savedTexture=localStorage.getItem(PIECE_TEXTURE_PREF);if(PIECE_TEXTURE_CHOICES.includes(savedTexture)){pieceTexture=savedTexture}else if(savedTexture!==null){localStorage.setItem(PIECE_TEXTURE_PREF,'toy')}}catch(_){}
 function setPieceTexture(value){
- pieceTexture=value==='origami'?'origami':'toy';
+ pieceTexture=PIECE_TEXTURE_CHOICES.includes(value)?value:'toy';
  for(const id of ['pieceTextureDesktop','pieceTextureMobile']){const el=$(id);if(el)el.value=pieceTexture}
  try{localStorage.setItem(PIECE_TEXTURE_PREF,pieceTexture)}catch(_){}
  renderPieces();
@@ -1189,6 +1200,7 @@ let paintingActive=false,paintSelectedId='coral',paintAction='one',paintExpanded
 try{const d=JSON.parse(localStorage.getItem(PAINT_PREF)||'{}');if(PAINT_BY_ID[d.selected])paintSelectedId=d.selected;if(Array.isArray(d.recent))paintRecent=[...new Set(d.recent.filter(x=>PAINT_BY_ID[x]))].slice(0,8)}catch(_){}
 function buildPaintMaterialDefs(container){
  for(const c of PAINT_COLORS){
+  jewelGradient(container,'paintJewel-'+c.id,c.hex);
   const face=node('linearGradient',{id:'paintFace-'+c.id,x1:'0%',y1:'0%',x2:'87%',y2:'100%'},container);
   for(const [offset,color] of [['0%',tone(c.hex,'white',.37)],['27%',tone(c.hex,'white',.19)],['61%',c.hex],['84%',tone(c.hex,'black',.09)],['100%',tone(c.hex,'black',.22)]])node('stop',{offset,'stop-color':color},face);
   const shine=node('radialGradient',{id:'paintGlow-'+c.id,cx:'26%',cy:'13%',r:'91%',fx:'24%',fy:'12%'},container);
@@ -1201,7 +1213,7 @@ try{const stored=localStorage.getItem(THEME_STORE);if(THEMES.some(t=>t.id===stor
 function themeObject(id=chosenTheme){return THEMES.find(t=>t.id===id)||THEMES[0]}
 function applyTheme(id,announce=false){
  const t=themeObject(id);chosenTheme=t.id;
- SHAPES.forEach((s,i)=>{s.color=t.colors[i]});
+ SHAPES.forEach((s,i)=>{s.color=t.colors[i]||DEFAULT_COLORS[s.id]});
  const materials=$('pieceMaterials');materials.replaceChildren();buildMaterialDefs(materials,SHAPES,'toy');buildPaintMaterialDefs(materials);
  buildPalette();renderAll();
  try{localStorage.setItem(THEME_STORE,chosenTheme)}catch(e){}
@@ -1265,8 +1277,43 @@ function tone(hex,mix,ratio){
  return '#'+rgb.map((v,i)=>Math.round(v*(1-ratio)+dest[i]*ratio).toString(16).padStart(2,'0')).join('');
 }
 function shapeBounds(s){const xs=s.points.map(q=>q[0]),ys=s.points.map(q=>q[1]);return {x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)}}
+// v9.32: jewel finish, applied only to the displayed face of each piece.
+// Retain the original base hue (including the selected color palette and 24 paint colors).
+function jewelBright(hex){const h=hex.replace('#','');const v=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255);return .2126*v[0]+.7152*v[1]+.0722*v[2]}
+// v9.32: keep the actual hue saturated. Specular light is localized rather than
+// whitening the entire resin piece; the dark edge stays in the piece's hue.
+function jewelGlare(hex){return Math.max(.28,Math.min(.49,.66-.38*jewelBright(hex)))}
+function jewelStops(hex){return [
+ ['0%',tone(hex,'white',.15)],['18%',tone(hex,'white',.035)],['40%',hex],
+ ['71%',hex],['88%',tone(hex,'black',.055)],['100%',tone(hex,'black',.13)]
+]}
+function jewelGradient(container,id,hex){const g=node('linearGradient',{id,x1:'7%',y1:'0%',x2:'78%',y2:'100%'},container);for(const [offset,color] of jewelStops(hex))node('stop',{offset,'stop-color':color},g)}
+function jewelCommonDefs(container,prefix){
+ const glow=node('radialGradient',{id:prefix+'JewelGlow',cx:'26%',cy:'15%',r:'72%',fx:'22%',fy:'9%'},container);
+ for(const [offset,opacity] of [['0%',.22],['18%',.12],['43%',.025],['70%',0],['100%',0]])node('stop',{offset,'stop-color':'#fff','stop-opacity':opacity},glow);
+ const bottom=node('linearGradient',{id:prefix+'JewelBottom',x1:'0%',y1:'0%',x2:'10%',y2:'100%'},container);
+ for(const [offset,opacity] of [['0%',0],['72%',0],['93%',.045],['100%',.10]])node('stop',{offset,'stop-color':'#fff','stop-opacity':opacity},bottom);
+ const pat=node('pattern',{id:prefix+'JewelPrism',patternUnits:'userSpaceOnUse',width:84,height:79},container);
+ node('path',{d:'M0 0 L35 5 L14 34 Z M35 5 L64 10 L44 45 L14 34 Z M14 34 L44 45 L19 79 Z M64 10 L84 42 L44 45 Z',fill:'#fff','fill-opacity':.085},pat);
+}
+function jewelShinePath(s){
+ const b=shapeBounds(s),x=b.x,y=b.y,w=b.w,h=b.h;
+ const f=n=>+n.toFixed(3);
+ if(s.id==='semi'||s.id==='fan')return `M ${f(x+w*.13)} ${f(y+h*.39)} Q ${f(x+w*.40)} ${f(y+h*.04)} ${f(x+w*.78)} ${f(y+h*.24)} Q ${f(x+w*.63)} ${f(y+h*.30)} ${f(x+w*.20)} ${f(y+h*.49)} Z`;
+ if(h>w*1.34)return `M ${f(x+w*.28)} ${f(y+h*.13)} Q ${f(x+w*.12)} ${f(y+h*.32)} ${f(x+w*.24)} ${f(y+h*.56)} Q ${f(x+w*.37)} ${f(y+h*.64)} ${f(x+w*.40)} ${f(y+h*.34)} Q ${f(x+w*.44)} ${f(y+h*.22)} ${f(x+w*.48)} ${f(y+h*.12)} Z`;
+ return `M ${f(x+w*.14)} ${f(y+h*.24)} Q ${f(x+w*.40)} ${f(y+h*.03)} ${f(x+w*.81)} ${f(y+h*.15)} Q ${f(x+w*.90)} ${f(y+h*.26)} ${f(x+w*.66)} ${f(y+h*.29)} Q ${f(x+w*.35)} ${f(y+h*.36)} ${f(x+w*.14)} ${f(y+h*.24)} Z`;
+}
+function jewelSparkle(s){const b=shapeBounds(s);return {x:b.x+b.w*.70,y:b.y+b.h*.65,size:Math.min(3.6,Math.max(1.4,Math.min(b.w,b.h)*.074))}}
 function buildMaterialDefs(container,shapes,prefix){
+ // One shared lightweight wood grain and glass sheen for all pieces. No filters or raster images.
+ const grain=node('pattern',{id:'woodGrain',patternUnits:'userSpaceOnUse',width:66,height:58},container);
+ node('path',{d:'M -8 8 C 8 2, 22 17, 38 9 S 58 4, 75 11 M -10 25 C 9 17, 22 35, 39 26 S 60 20, 77 29 M -9 44 C 7 37, 22 54, 42 45 S 63 42, 77 47',fill:'none',stroke:'#754c35','stroke-width':1.15,'stroke-opacity':.18},grain);
+ node('path',{d:'M -5 14 Q 15 8, 33 15 T 72 16 M -5 33 Q 15 27, 34 34 T 73 35 M -5 52 Q 15 46, 33 53 T 72 54',fill:'none',stroke:'#fff','stroke-width':1.3,'stroke-opacity':.21},grain);
+ const glass=node('linearGradient',{id:'glassSheen',x1:'0%',y1:'0%',x2:'100%',y2:'100%'},container);
+ for(const [offset,opacity] of [['0%',.48],['22%',.28],['41%',.05],['58%',0],['81%',.06],['100%',.24]])node('stop',{offset,'stop-color':'#fff','stop-opacity':opacity},glass);
+ jewelCommonDefs(container,prefix);
  for(const s of shapes){
+  jewelGradient(container,`${prefix}Jewel-${s.id}`,s.color);
   const base=node('linearGradient',{id:`${prefix}Face-${s.id}`,x1:'0%',y1:'0%',x2:'87%',y2:'100%'},container);
   for(const [offset,color] of [['0%',tone(s.color,'white',.37)],['27%',tone(s.color,'white',.19)],['61%',s.color],['84%',tone(s.color,'black',.09)],['100%',tone(s.color,'black',.22)]])node('stop',{offset,'stop-color':color},base);
   const shine=node('radialGradient',{id:`${prefix}Glow-${s.id}`,cx:'26%',cy:'13%',r:'91%',fx:'24%',fy:'12%'},container);
@@ -1287,6 +1334,38 @@ function drawPiece(g,p,selectedFlag=false,ghost=false,groupMarked=false,prefix='
  // Keep selection/group highlights and the drag-only lift shadow handled by paintPiece().
  if(pieceTexture==='origami'){
   return node('polygon',{points:pts,fill:baseColor,stroke:tone(baseColor,'black',.32),'stroke-width':1.8,'stroke-linejoin':'round'},g);
+ }
+ if(pieceTexture==='wood'){
+  const face=node('polygon',{points:pts,fill:tone(baseColor,'white',.07),stroke:tone(baseColor,'black',.34),'stroke-width':2.3,'stroke-linejoin':'round'},g);
+  node('polygon',{points:pts,fill:'url(#woodGrain)',stroke:'none'},g);
+  node('polygon',{points:pts,fill:'none',stroke:'#fff','stroke-width':2,'stroke-opacity':.24,'stroke-linejoin':'round','clip-path':`url(#${prefix}Clip-${s.id})`},g);
+  return face;
+ }
+ if(pieceTexture==='jewel'){
+  const face=node('polygon',{points:pts,fill:`url(#${tint?'paintJewel-'+tint.id:prefix+'Jewel-'+s.id})`,stroke:tone(baseColor,'black',.26),'stroke-width':2.65,'stroke-linejoin':'round'},g);
+  const glitter=node('g',{'clip-path':`url(#${prefix}Clip-${s.id})`},g);
+  const b=shapeBounds(s),small=Math.min(b.w,b.h)<33;
+  if(!small)node('polygon',{points:pts,fill:`url(#${prefix}JewelPrism)`,opacity:.55},glitter);
+  node('polygon',{points:pts,fill:`url(#${prefix}JewelGlow)`,opacity:.82},glitter);
+  node('polygon',{points:pts,fill:`url(#${prefix}JewelBottom)`,opacity:.65},glitter);
+  // A slim colored rim suggests domed resin without a cloudy white coating.
+  node('polygon',{points:pts,fill:'none',stroke:tone(baseColor,'white',.64),'stroke-width':3.2,'stroke-opacity':.52,'stroke-linejoin':'round'},glitter);
+  node('path',{d:jewelShinePath(s),fill:'#fff',opacity:jewelGlare(baseColor)*(small?.78:1)},glitter);
+  if(!small){
+   const sp=jewelSparkle(s),r=Math.min(2.3,sp.size*.63);
+   node('circle',{cx:sp.x,cy:sp.y,r:r,fill:'#fff',opacity:.92},glitter);
+   node('path',{d:`M ${sp.x-r*1.85} ${sp.y} L ${sp.x+r*1.85} ${sp.y} M ${sp.x} ${sp.y-r*1.85} L ${sp.x} ${sp.y+r*1.85}`,stroke:'#fff','stroke-width':Math.max(.8,r*.54),'stroke-linecap':'round','stroke-opacity':.73,fill:'none'},glitter);
+  }
+  return face;
+ }
+ if(pieceTexture==='glass'){
+  const face=node('polygon',{points:pts,fill:baseColor,stroke:tone(baseColor,'black',.42),'stroke-width':3.4,'stroke-linejoin':'round'},g);
+  node('polygon',{points:pts,fill:'url(#glassSheen)',stroke:'none'},g);
+  const glassRim=node('g',{'clip-path':`url(#${prefix}Clip-${s.id})`},g);
+  node('polygon',{points:pts,fill:'none',stroke:'#fff','stroke-opacity':.47,'stroke-width':5,'stroke-linejoin':'round'},glassRim);
+  const bb=shapeBounds(s);
+  if(bb.w>24&&bb.h>24)node('path',{d:`M ${bb.x+bb.w*.16} ${bb.y+bb.h*.15} L ${bb.x+bb.w*.42} ${bb.y+bb.h*.15-bb.w*.07}`,stroke:'#fff','stroke-opacity':.36,'stroke-width':Math.min(4,bb.w*.065),'stroke-linecap':'round',fill:'none'},glassRim);
+  return face;
  }
  const face=node('polygon',{points:pts,fill:`url(#${faceId})`,stroke:tone(baseColor,'black',.18),'stroke-width':2.8,'stroke-linejoin':'round'},g);
  node('polygon',{points:pts,fill:`url(#${glowId})`,stroke:'none'},g);
@@ -1826,10 +1905,13 @@ document.addEventListener('keydown',e=>{if(currentFeature||$('albumViewer').clas
 let album=[];let currentFeature=null,ideaIndex=0;
 const ALBUM_VIEW_PREF='pitatorie_album_view_v9_4';
 const ALBUM_SORTS=['newest','oldest','name','many','manual'];
-let albumSort='newest',albumFavOnly=false,albumShownLimit=12,viewingArtId=null,viewerReturnFocus=null;
-try{const prefs=JSON.parse(localStorage.getItem(ALBUM_VIEW_PREF)||'{}');if(ALBUM_SORTS.includes(prefs.sort))albumSort=prefs.sort;albumFavOnly=prefs.favorites===true}catch(e){}
-function saveAlbumView(){try{localStorage.setItem(ALBUM_VIEW_PREF,JSON.stringify({sort:albumSort,favorites:albumFavOnly}))}catch(e){}}
-function visibleAlbum(){const subset=albumFavOnly?album.filter(a=>a.favorite===true):album.slice();
+const ALBUM_KINDS=['all','mine','colored'];
+// Older album works without colorExchange are treated as original works.
+const isColoredAlbumArt=a=>a?.colorExchange?.kind==='colored';
+let albumSort='newest',albumKind='all',albumFavOnly=false,albumShownLimit=12,viewingArtId=null,viewerReturnFocus=null;
+try{const prefs=JSON.parse(localStorage.getItem(ALBUM_VIEW_PREF)||'{}');if(ALBUM_SORTS.includes(prefs.sort))albumSort=prefs.sort;if(ALBUM_KINDS.includes(prefs.kind))albumKind=prefs.kind;albumFavOnly=prefs.favorites===true}catch(e){}
+function saveAlbumView(){try{localStorage.setItem(ALBUM_VIEW_PREF,JSON.stringify({sort:albumSort,kind:albumKind,favorites:albumFavOnly}))}catch(e){}}
+function visibleAlbum(){const subset=album.filter(a=>(albumKind==='all'||(albumKind==='colored'?isColoredAlbumArt(a):!isColoredAlbumArt(a)))&&(!albumFavOnly||a.favorite===true));
  if(albumSort==='newest')subset.sort((a,b)=>(+b.date||0)-(+a.date||0));
  if(albumSort==='oldest')subset.sort((a,b)=>(+a.date||0)-(+b.date||0));
  if(albumSort==='name')subset.sort((a,b)=>String(a.name).localeCompare(String(b.name),'ja'));
@@ -1879,9 +1961,43 @@ IDEAS.push(...[["いきものと自然","森の番人のフクロウ","大きな
 try{const a=JSON.parse(localStorage.getItem(ALBUM_STORE)||'[]');if(Array.isArray(a))album=a.filter(v=>v&&Array.isArray(v.pieces)&&typeof v.name==='string')}catch(e){}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function putAlbum(){try{localStorage.setItem(ALBUM_STORE,JSON.stringify(album));return true}catch(e){toast('保存領域が足りないみたい');return false}}
+let artworkMaterialSeq=0;
+function jewelAlbumDefs(colors,types,tid){
+ const gradients=colors.map((c,i)=>'<linearGradient id="'+tid+'J'+i+'" x1="7%" y1="0%" x2="78%" y2="100%">'+jewelStops(c).map(([off,col])=>'<stop offset="'+off+'" stop-color="'+col+'"/>').join('')+'</linearGradient>').join('');
+ const clips=types.map(type=>'<clipPath id="'+tid+'Clip-'+type+'" clipPathUnits="userSpaceOnUse"><polygon points="'+polygonPoints(type)+'"/></clipPath>').join('');
+ const common='<radialGradient id="'+tid+'JewelGlow" cx="28%" cy="17%" r="86%" fx="23%" fy="11%"><stop offset="0%" stop-color="#fff" stop-opacity=".68"/><stop offset="18%" stop-color="#fff" stop-opacity=".46"/><stop offset="44%" stop-color="#fff" stop-opacity=".16"/><stop offset="79%" stop-color="#fff" stop-opacity="0"/></radialGradient>'+
+ '<linearGradient id="'+tid+'JewelBottom" x1="0%" y1="0%" x2="10%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="55%" stop-color="#fff" stop-opacity="0"/><stop offset="86%" stop-color="#fff" stop-opacity=".12"/><stop offset="100%" stop-color="#fff" stop-opacity=".38"/></linearGradient>'+
+ '<pattern id="'+tid+'JewelPrism" patternUnits="userSpaceOnUse" width="84" height="79"><path d="M0 0 L35 5 L14 34 Z M35 5 L64 10 L44 45 L14 34 Z M14 34 L44 45 L19 79 Z M64 10 L84 42 L44 45 Z" fill="#fff" fill-opacity=".16"/><path d="M35 5 L64 10 L44 45 Z M44 45 L84 42 L70 77 Z" fill="#322353" fill-opacity=".055"/></pattern>';
+ return '<defs>'+gradients+clips+common+'</defs>';
+}
+function jewelAlbumPiece(s,color,tid,index,transform){
+ const pts=polygonPoints(s.id),b=shapeBounds(s),small=Math.min(b.w,b.h)<33;
+ const glare=jewelGlare(color)*(small?.70:1);
+ let inside='<polygon points="'+pts+'" fill="url(#'+tid+'JewelGlow)" opacity="'+Math.min(.95,jewelGlare(color)+.15)+'"/>'+
+ '<polygon points="'+pts+'" fill="url(#'+tid+'JewelBottom)" opacity=".9"/>'+
+ '<polygon points="'+pts+'" fill="none" stroke="'+tone(color,'white',.63)+'" stroke-width="6" stroke-opacity=".64" stroke-linejoin="round"/>'+
+ '<path d="'+jewelShinePath(s)+'" fill="#fff" opacity="'+glare+'"/>';
+ if(!small){const sp=jewelSparkle(s);inside='<polygon points="'+pts+'" fill="url(#'+tid+'JewelPrism)" opacity=".76"/>'+inside+
+ '<circle cx="'+sp.x+'" cy="'+sp.y+'" r="'+sp.size*.95+'" fill="#fff" opacity=".74"/>'+
+ '<path d="M '+(sp.x-sp.size*1.7)+' '+sp.y+' L '+(sp.x+sp.size*1.7)+' '+sp.y+' M '+sp.x+' '+(sp.y-sp.size*1.7)+' L '+sp.x+' '+(sp.y+sp.size*1.7)+'" stroke="#fff" stroke-width="'+Math.max(.85,sp.size*.55)+'" stroke-linecap="round" stroke-opacity=".65" fill="none"/>'}
+ return '<g'+transform+'><polygon points="'+pts+'" fill="url(#'+tid+'J'+index+')" stroke="'+tone(color,'black',.52)+'" stroke-width="3.8" stroke-linejoin="round"/><g clip-path="url(#'+tid+'Clip-'+s.id+')">'+inside+'</g></g>';
+}
 function artSvg(a){const th=themeObject(a.theme);const b=boundsFor(a.boardSize||'medium');const list=a.pieces.slice(0,TOTAL_PIECES).filter(p=>SHAPE[p.type]);
- const content=list.map(p=>{const s=SHAPE[p.type],n=SHAPES.findIndex(x=>x.id===p.type);return '<polygon points="'+polygonPoints(s.id)+'" transform="translate('+Number(p.x)+' '+Number(p.y)+') rotate('+Number(p.rot||0)+')" fill="'+(PAINT_BY_ID[p.paintId]?.hex||th.colors[n])+'" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>'}).join('');
- return '<svg viewBox="'+b.x+' '+b.y+' '+b.w+' '+b.h+'" role="img" aria-label="'+esc(a.name)+'の作品"><rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" fill="#fffaf0"/>'+content+'</svg>';
+ const tid='artmat'+(++artworkMaterialSeq),woodId=tid+'Wood',glassId=tid+'Glass';
+ const jewelColors=[...new Set(list.map(p=>{const sh=SHAPE[p.type],n=SHAPES.findIndex(q=>q.id===p.type);return PAINT_BY_ID[p.paintId]?.hex||th.colors[n]||DEFAULT_COLORS[sh.id]}))];
+ const jewelTypes=[...new Set(list.map(p=>p.type))];
+ const jewelColorIndex=new Map(jewelColors.map((c,i)=>[c,i]));
+ const defs=pieceTexture==='jewel'?jewelAlbumDefs(jewelColors,jewelTypes,tid):
+ pieceTexture==='wood'?'<defs><pattern id="'+woodId+'" patternUnits="userSpaceOnUse" width="66" height="58"><path d="M -8 8 C 8 2,22 17,38 9 S 58 4,75 11 M -10 25 C 9 17,22 35,39 26 S 60 20,77 29 M -9 44 C 7 37,22 54,42 45 S 63 42,77 47" fill="none" stroke="#754c35" stroke-width="1.15" stroke-opacity=".18"/><path d="M -5 14 Q 15 8,33 15 T 72 16 M -5 33 Q 15 27,34 34 T 73 35 M -5 52 Q 15 46,33 53 T 72 54" fill="none" stroke="#fff" stroke-width="1.3" stroke-opacity=".21"/></pattern></defs>':
+ pieceTexture==='glass'?'<defs><linearGradient id="'+glassId+'" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity=".48"/><stop offset="22%" stop-color="#fff" stop-opacity=".28"/><stop offset="41%" stop-color="#fff" stop-opacity=".05"/><stop offset="58%" stop-color="#fff" stop-opacity="0"/><stop offset="81%" stop-color="#fff" stop-opacity=".06"/><stop offset="100%" stop-color="#fff" stop-opacity=".24"/></linearGradient></defs>':'';
+ const content=list.map(p=>{const s=SHAPE[p.type],n=SHAPES.findIndex(x=>x.id===p.type),color=PAINT_BY_ID[p.paintId]?.hex||th.colors[n]||DEFAULT_COLORS[s.id];
+ const shape='<polygon points="'+polygonPoints(s.id)+'"',transform=' transform="translate('+Number(p.x)+' '+Number(p.y)+') rotate('+Number(p.rot||0)+')"';
+ if(pieceTexture==='jewel')return jewelAlbumPiece(s,color,tid,jewelColorIndex.get(color),transform);
+ if(pieceTexture==='wood')return '<g'+transform+'>'+shape+' fill="'+tone(color,'white',.07)+'" stroke="'+tone(color,'black',.34)+'" stroke-width="2.3" stroke-linejoin="round"/>'+shape+' fill="url(#'+woodId+')" stroke="none"/></g>';
+ if(pieceTexture==='glass')return '<g'+transform+'>'+shape+' fill="'+color+'" stroke="'+tone(color,'black',.42)+'" stroke-width="3.4" stroke-linejoin="round"/>'+shape+' fill="url(#'+glassId+')" stroke="none"/>'+shape+' fill="none" stroke="#fff" stroke-opacity=".34" stroke-width="1.8" stroke-linejoin="round"/></g>';
+ return shape+transform+' fill="'+color+'" stroke="'+(pieceTexture==='origami'?tone(color,'black',.32):'#fff')+'" stroke-width="'+(pieceTexture==='origami'?'1.8':'3')+'" stroke-linejoin="round"/>';
+ }).join('');
+ return '<svg viewBox="'+b.x+' '+b.y+' '+b.w+' '+b.h+'" role="img" aria-label="'+esc(a.name)+'の作品">'+defs+'<rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" fill="#fffaf0"/>'+content+'</svg>';
 }
 function iconHtml(name,extra=''){return '<span class="uiicon icon-'+name+(extra?' '+extra:'')+'" aria-hidden="true"></span>'}
 function setFeatureHtml(title,content){$('featureTitle').innerHTML=title;$('featureBody').innerHTML=content}
@@ -2127,6 +2243,8 @@ function renderFeature(){
 
  if(currentFeature==='album'){
  const shown=visibleAlbum(),pageItems=shown.slice(0,albumShownLimit),favCount=album.filter(a=>a.favorite===true).length;
+ const kinds=[['all','すべて'],['mine','自分の作品'],['colored','ぬりえ作品']];
+ const kindButtons='<div class="album-kind-filter" role="group" aria-label="作品の種類で絞り込む">'+kinds.map(([value,label])=>'<button type="button" data-album-kind="'+value+'" aria-pressed="'+(albumKind===value)+'">'+label+'</button>').join('')+'</div>';
  const options=[['newest','新しい順'],['oldest','古い順'],['name','名前順'],['many','ピースが多い順'],['manual','好きな順に並べる']].map(([v,label])=>'<option value="'+v+'"'+(albumSort===v?' selected':'')+'>'+label+'</option>').join('');
  const items=pageItems.map((a,index)=>{
   const id=esc(a.id),fav=a.favorite===true;
@@ -2143,13 +2261,15 @@ function renderFeature(){
  setFeatureHtml(iconHtml('book')+'わたしの作品アルバム',
  '<p>作品を保存して、並べたり、お気に入りを集めたり。サムネイルを押すと大きく眺められます。</p>'+
  '<div class="feature-row"><input class="feature-input" id="albumName" aria-label="作品の名前" maxlength="32" placeholder="作品の名前" value="'+esc('作品 '+(album.length+1))+'"><button class="feature-cta" id="albumSave">この作品を保存</button></div>'+
+ kindButtons+
  '<div class="album-toolbar"><label for="albumSort">並び順</label><select id="albumSort" aria-label="作品の並び順">'+options+'</select><button type="button" id="albumFavOnly" aria-pressed="'+albumFavOnly+'"><span class="uiicon icon-heart" aria-hidden="true"></span>お気に入りだけ</button></div>'+
  '<div class="album-count">全'+album.length+'作品 ・ お気に入り'+favCount+'作品 ・ 表示'+shown.length+'作品'+(albumSort==='manual'?' ｜ 各作品の「上へ・下へ」で並べ替え':'')+'</div>'+
- '<div class="feature-grid album-grid">'+(items||'<div class="album-empty">'+(albumFavOnly?'まだお気に入りの作品はありません。♡を押して登録してみよう。':'まだ作品がありません。まずひとつ作って保存してみましょう！')+'</div>')+'</div>'+
+ '<div class="feature-grid album-grid">'+(items||'<div class="album-empty">'+(albumFavOnly?'この条件に合うお気に入りはまだありません。':'この種類の作品はまだありません。')+'</div>')+'</div>'+
  (shown.length>albumShownLimit?'<button type="button" class="feature-action" id="albumMore">もっと見る（'+pageItems.length+' / '+shown.length+'作品）</button>':'')+
  '<div class="feature-info">作品とお気に入り、並び順はこのブラウザ内に保存されます。機種やHTMLを変える前にはバックアップを取ってください。</div>'+
  '<div class="feature-row"><button class="feature-action" id="albumExport">⬇ バックアップ保存</button><button class="feature-action" id="albumImportBtn">⬆ バックアップ読込</button><input id="albumImport" type="file" accept=".json,application/json" hidden></div>');
  $('albumSort').onchange=e=>{albumSort=e.target.value;albumShownLimit=12;saveAlbumView();renderFeature()};
+ for(const b of $('featureBody').querySelectorAll('[data-album-kind]'))b.onclick=()=>{const kind=b.dataset.albumKind;if(!ALBUM_KINDS.includes(kind))return;albumKind=kind;albumShownLimit=12;saveAlbumView();renderFeature()};
  $('albumFavOnly').onclick=()=>{albumFavOnly=!albumFavOnly;albumShownLimit=12;saveAlbumView();renderFeature()};
  if($('albumMore'))$('albumMore').onclick=()=>{albumShownLimit+=12;refreshAlbumKeepScroll()};
  $('albumExport').onclick=()=>{
@@ -2181,7 +2301,8 @@ function renderFeature(){
   if(!pieces.length){toast('まずピースを置いてみよう');return}
   const name=($('albumName').value.trim()||'名前のない作品').slice(0,32),snapshot=clone(album);
   const a={id:String(Date.now())+'-'+Math.random().toString(36).slice(2),date:Date.now(),name,
-   theme:chosenTheme,boardSize:mode==='free'?freeBoardSize:'medium',favorite:false,pieces:clone(pieces)};
+   theme:chosenTheme,boardSize:mode==='free'?freeBoardSize:'medium',favorite:false,pieces:clone(pieces),
+   ...(colorShareSession?.active===true?{colorExchange:{kind:'colored',exchangeId:colorShareSession.request.exchangeId||'',maker:colorShareSession.request.maker||'',coloredBy:colorShareSession.coloredBy||''}}:{})};
   album.push(a);if(!putAlbum()){album=snapshot;return}
   toast('作品をアルバムに保存したよ！');renderFeature();
  };
