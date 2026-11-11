@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#ffefd5">
-<title>ピタトリエ v9.25 — つくる・ぬる・ひらめく</title>
+<title>ピタトリエ v9.27 — つくる・ぬる・ひらめく</title>
 <style>
 :root{font-family:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;color:#33465b;--ink:#34465b;--soft:#6e7e8e;--peach:#ff8d86;--mint:#7fd3c3;--cream:#fff8ed;--shadow:0 7px 0 #dfd9d0,0 10px 28px #8c85801b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{background:#f8f1e7}body{margin:0;background:radial-gradient(circle at 17% 2%,#ffeadb 0,transparent 31%),radial-gradient(circle at 98% 20%,#e3f7f0 0,transparent 42%),linear-gradient(180deg,#fff9ef,#f9f0e6);min-height:100dvh;overscroll-behavior-y:contain}
@@ -819,12 +819,31 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 }
 .toybox-hint .uiicon.icon-heart{width:22px;height:22px;min-width:22px;vertical-align:-5px;margin-right:5px}
 
-/* v9.25: only the piece material changes; all existing game UI stays as is. */
+/* v9.27: only the piece material changes; all existing game UI stays as is. */
 .texture-setting{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;color:#865d4c;font-size:13px;font-weight:900;line-height:1.4;cursor:pointer}
 .texture-setting-label{flex:1;min-width:0}
 .texture-setting select{font:inherit;font-size:14px;font-weight:900;color:#754a32;background:#fffaf0;border:2px solid #e6c79c;border-radius:12px;min-height:44px;min-width:123px;max-width:100%;padding:8px 9px;cursor:pointer}
 .texture-setting select:focus-visible{outline:3px solid #f6ab86;outline-offset:2px}
 .mobile-sheet .texture-setting{min-height:44px;margin-top:5px;margin-bottom:0;font-size:14px}
+
+/* v9.27: collapse the paint palette without changing the board's layout. */
+.paint-toggle{display:inline-flex;align-items:center;justify-content:center;gap:2px;border:0;border-radius:10px;background:transparent;min-height:39px;padding:3px 4px;color:#714433;font:inherit;font-size:13px;font-weight:950;white-space:nowrap;cursor:pointer;touch-action:manipulation;flex:none}
+.paint-toggle .uiicon{margin-right:1px}
+.paint-toggle:focus-visible{outline:3px solid #ae7393;outline-offset:1px}
+.paint-color-peek{width:14px;height:14px;flex:none;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 1px #b99478,0 1px 2px #7e4f4c33;margin-left:3px}
+.paint-panel.is-collapsed{left:auto;right:8px;bottom:8px;top:auto;width:max-content;max-height:58px;padding:4px 7px;overflow:visible;border-radius:14px}
+.paint-panel.is-collapsed .paint-panel-top{display:block}
+.paint-panel.is-collapsed .paint-panel-top > :not(#paintToggle),
+.paint-panel.is-collapsed #paintQuickColors,
+.paint-panel.is-collapsed .paint-bottom,
+.paint-panel.is-collapsed #paintAllColors{display:none!important}
+.paint-panel.is-collapsed #paintToggle{min-height:44px;font-size:13px;padding:4px 8px}
+@media(max-width:420px){.paint-toggle{font-size:11px;min-height:36px;padding:1px 2px}.paint-panel.is-collapsed #paintToggle{font-size:12px}}
+@media (orientation:landscape) and (max-height:500px) and (min-width:600px){
+ .paint-panel.is-collapsed{left:auto;right:7px;top:auto;bottom:7px;width:max-content;max-height:58px;overflow:visible}
+ .paint-panel.is-collapsed .paint-panel-top{display:block}
+}
+@media(min-width:901px){.paint-panel.is-collapsed{position:fixed;right:max(22px,calc((100vw - 1180px)/2 + 22px));bottom:22px}}
 </style>
 </head>
 <body>
@@ -868,7 +887,7 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 <button id="mobileOpenPieces" class="open-pieces" aria-controls="mobilePaletteSheet" aria-expanded="false">＋ ピース</button>
 </div>
 <section id="paintPanel" class="paint-panel" aria-label="いろぬりの道具" hidden>
- <div class="paint-panel-top"><strong><span class="uiicon icon-palette" aria-hidden="true"></span>いろぬり</strong>
+ <div class="paint-panel-top"><button type="button" id="paintToggle" class="paint-toggle" aria-expanded="true" aria-label="色パレットをたたむ"><span class="uiicon icon-palette" aria-hidden="true"></span><span id="paintToggleLabel">しまう ▾</span><span id="paintColorPeek" class="paint-color-peek" aria-hidden="true"></span></button>
   <span id="paintCurrentName" class="paint-current-name">あか</span>
   <button type="button" id="paintUndo" class="paint-mini-btn" aria-label="いろぬりをもどす">↩ もどす</button>
   <button type="button" id="paintExit" class="paint-exit">つくるにもどる ×</button>
@@ -1018,9 +1037,9 @@ const SHAPES=[
  {id:'pent',name:'ごかく',max:20,color:'#f08bb0',spec:'1辺2.5cmの正五角形',points:Array.from({length:5},(_,i)=>{const radius=UNIT/(2*Math.sin(Math.PI/5)),a=(-90+i*72)*Math.PI/180;return [radius*Math.cos(a),radius*Math.sin(a)]})},
  // 正方形(54×54)をちょうど二つに切った長方形(27×54)。
  {id:'tall',name:'たてなが',max:32,color:'#789ed9',spec:'1.25 × 2.5cm',points:[[-UNIT/4,-UNIT/2],[UNIT/4,-UNIT/2],[UNIT/4,UNIT/2],[-UNIT/4,UNIT/2]]},
- // 底辺27＝たてながの短辺、ほかの2辺108＝ろっかくの1辺54の2倍。
- // 頂点から底辺への高さは三平方の定理で決定し、図形の重心を原点にする。
- {id:'thintri',name:'ほそさんかく',max:40,color:'#f18d73',spec:'底辺1.25cm・ほかの2辺5.0cm',points:(()=>{const h=Math.sqrt((2*UNIT)**2-(UNIT/4)**2);return [[-UNIT/4,h/3],[UNIT/4,h/3],[0,-2*h/3]]})()}
+ // 底辺54＝ろっかくの一辺、ほかの2辺108＝ろっかくの一辺54の2倍。
+ // 底辺の半分27から高さを計算し、図形の重心を原点にする（各辺54,108,108）。
+ {id:'thintri',name:'ほそさんかく',max:40,color:'#f18d73',spec:'底辺2.5cm・ほかの2辺5.0cm',points:(()=>{const halfBase=UNIT/2,h=Math.sqrt((2*UNIT)**2-halfBase**2);return [[-halfBase,h/3],[halfBase,h/3],[0,-2*h/3]]})()}
 ];
 // すべて反時計回りの頂点列にそろえる。辺の外側へ新しいピースを接続するため。
 for(const shape of SHAPES){const v=shape.points;if(v.reduce((sum,p,i)=>sum+p[0]*v[(i+1)%v.length][1]-v[(i+1)%v.length][0]*p[1],0)<0)v.reverse()}
@@ -1166,7 +1185,7 @@ function setPieceTexture(value){
  renderPieces();
 }
 const PAINT_PREF='pitatorie_paint_preferences_v1';
-let paintingActive=false,paintSelectedId='coral',paintAction='one',paintExpanded=false,paintRecent=['coral','yellow','mint','blue','pink','lime','violet','cream'];
+let paintingActive=false,paintSelectedId='coral',paintAction='one',paintExpanded=false,paintCollapsed=false,paintRecent=['coral','yellow','mint','blue','pink','lime','violet','cream'];
 try{const d=JSON.parse(localStorage.getItem(PAINT_PREF)||'{}');if(PAINT_BY_ID[d.selected])paintSelectedId=d.selected;if(Array.isArray(d.recent))paintRecent=[...new Set(d.recent.filter(x=>PAINT_BY_ID[x]))].slice(0,8)}catch(_){}
 function buildPaintMaterialDefs(container){
  for(const c of PAINT_COLORS){
@@ -2278,8 +2297,13 @@ function applyCamera(){
  if(!svg.clientHeight||!svg.clientWidth)return;
  camera.h=Math.max(155,Math.min(Math.max(4000,b.h*3),camera.h));
  const vw=camera.h*svg.clientWidth/Math.max(1,svg.clientHeight);
- camera.cx=vw<b.w?Math.max(b.left+vw/2,Math.min(b.right-vw/2,camera.cx)):350;
- camera.cy=camera.h<b.h?Math.max(b.top+camera.h/2,Math.min(b.bottom-camera.h/2,camera.cy)):310;
+ // Mobile painting: leave extra room to slide pieces out from under the palette.
+ // No change to the geometry, board bounds, saving, or camera constraints outside painting.
+ const paintPanRoom=paintingActive&&isMobileView()?camera.h*.47:0;
+ const minCX=b.left+vw/2-paintPanRoom,maxCX=b.right-vw/2+paintPanRoom;
+ const minCY=b.top+camera.h/2-paintPanRoom,maxCY=b.bottom-camera.h/2+paintPanRoom;
+ camera.cx=minCX<=maxCX?Math.max(minCX,Math.min(maxCX,camera.cx)):350;
+ camera.cy=minCY<=maxCY?Math.max(minCY,Math.min(maxCY,camera.cy)):310;
  svg.setAttribute('viewBox',`${camera.cx-vw/2} ${camera.cy-camera.h/2} ${vw} ${camera.h}`);
 }
 function resetCamera(){camera.cx=350;camera.cy=310;const box=svg.getBoundingClientRect(),b=boundsFor();const ratio=box.width/Math.max(1,box.height);
@@ -2429,6 +2453,7 @@ function choosePaint(id){if(!PAINT_BY_ID[id])return;paintSelectedId=id;paintRece
 function paintChip(c){const button=document.createElement('button');button.type='button';button.className='paint-chip';button.style.background=c.hex;button.title=c.name;button.setAttribute('aria-label',c.name);button.setAttribute('aria-pressed',String(paintSelectedId===c.id));button.onclick=()=>choosePaint(c.id);return button}
 function renderPaintControls(){
  $('paintCurrentName').textContent=PAINT_BY_ID[paintSelectedId]?.name||'いろをえらぶ';
+ $('paintPanel').classList.toggle('is-collapsed',paintCollapsed);$('paintToggleLabel').textContent=paintCollapsed?'色パレット ▴':'しまう ▾';$('paintToggle').setAttribute('aria-expanded',String(!paintCollapsed));$('paintToggle').setAttribute('aria-label',paintCollapsed?'色パレットをひらく':'色パレットをたたむ');$('paintColorPeek').style.background=PAINT_BY_ID[paintSelectedId]?.hex||'#ffe5db';
  $('paintQuickColors').replaceChildren();for(const id of paintRecent){const c=PAINT_BY_ID[id];if(c)$('paintQuickColors').append(paintChip(c))}
  $('paintAllColors').hidden=!paintExpanded;$('paintExpand').setAttribute('aria-expanded',String(paintExpanded));$('paintExpand').textContent=paintExpanded?'24色 ▴':'24色 ▾';
  if(paintExpanded){$('paintAllColors').replaceChildren();for(const c of PAINT_COLORS)$('paintAllColors').append(paintChip(c))}
@@ -2439,10 +2464,11 @@ function setPainting(on){if(colorShareSession&&!on)return;
 
  if(on&&mode!=='free')showMode('free');
  if(paintStroke){if(paintStroke.changed)save();paintStroke=null}
- paintingActive=!!on;selected=null;drag=null;
+ paintingActive=!!on;if(paintingActive)paintCollapsed=false;selected=null;drag=null;
  $('paintPanel').hidden=!paintingActive;document.body.classList.toggle('paint-mode',paintingActive);document.body.classList.toggle('color-exchange-active',!!colorShareSession);$('paintExit').textContent=colorShareSession?'交換メニューへ':'つくるにもどる ×';
- renderAll();if(paintingActive){closeFeature();closeMobileSheet();renderPaintControls();toast('色をえらんで、ピースをタップしてね')}
+ renderAll();if(paintingActive){closeFeature();closeMobileSheet();renderPaintControls();toast('色をえらんで、ピースをタップしてね')}else{applyCamera()}
 }
+$('paintToggle').onclick=()=>{paintCollapsed=!paintCollapsed;renderPaintControls();applyCamera()};
 $('paintExit').onclick=()=>{if(colorShareSession)openFeature('exchange');else setPainting(false)};
 $('paintExpand').onclick=()=>{paintExpanded=!paintExpanded;renderPaintControls()};
 $('paintUndo').onclick=()=>$('undo').click();
