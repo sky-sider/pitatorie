@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#ffefd5">
-<title>ピタトリエ v9.22 — つくる・ぬる・ひらめく</title>
+<title>ピタトリエ v9.25 — つくる・ぬる・ひらめく</title>
 <style>
 :root{font-family:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;color:#33465b;--ink:#34465b;--soft:#6e7e8e;--peach:#ff8d86;--mint:#7fd3c3;--cream:#fff8ed;--shadow:0 7px 0 #dfd9d0,0 10px 28px #8c85801b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{background:#f8f1e7}body{margin:0;background:radial-gradient(circle at 17% 2%,#ffeadb 0,transparent 31%),radial-gradient(circle at 98% 20%,#e3f7f0 0,transparent 42%),linear-gradient(180deg,#fff9ef,#f9f0e6);min-height:100dvh;overscroll-behavior-y:contain}
@@ -818,6 +818,13 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
   #albumFavOnly .icon-heart{width:26px;height:26px;min-width:26px}
 }
 .toybox-hint .uiicon.icon-heart{width:22px;height:22px;min-width:22px;vertical-align:-5px;margin-right:5px}
+
+/* v9.25: only the piece material changes; all existing game UI stays as is. */
+.texture-setting{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;color:#865d4c;font-size:13px;font-weight:900;line-height:1.4;cursor:pointer}
+.texture-setting-label{flex:1;min-width:0}
+.texture-setting select{font:inherit;font-size:14px;font-weight:900;color:#754a32;background:#fffaf0;border:2px solid #e6c79c;border-radius:12px;min-height:44px;min-width:123px;max-width:100%;padding:8px 9px;cursor:pointer}
+.texture-setting select:focus-visible{outline:3px solid #f6ab86;outline-offset:2px}
+.mobile-sheet .texture-setting{min-height:44px;margin-top:5px;margin-bottom:0;font-size:14px}
 </style>
 </head>
 <body>
@@ -908,7 +915,7 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 <button data-feature="colors"><span class="uiicon icon-palette" aria-hidden="true"></span>カラーセット</button>
 <button data-feature="tools"><span class="uiicon icon-scissors" aria-hidden="true"></span>創作ツール</button>
 </div><p class="tiny">作品も色もこの端末に保存できます。ピースの形は変わりません。</p></section>
-<section class="panel"><h2><span class="uiicon icon-gear" aria-hidden="true"></span>ちいさな せってい</h2><label class="switch"><input id="sound" type="checkbox" checked>ぴたっとくっつく音</label><p class="tiny" style="margin-top:9px">作品はこの端末のブラウザに自動保存されます。インターネット接続なしでも遊べます。</p></section>
+<section class="panel"><h2><span class="uiicon icon-gear" aria-hidden="true"></span>ちいさな せってい</h2><label class="switch"><input id="sound" type="checkbox" checked>ぴたっとくっつく音</label><label class="texture-setting" for="pieceTextureDesktop"><span class="texture-setting-label">ピースのしつかん</span><select id="pieceTextureDesktop" aria-label="ピースのしつかん"><option value="toy">いつもの</option><option value="origami">おりがみ</option></select></label><p class="tiny" style="margin-top:9px">作品はこの端末のブラウザに自動保存されます。インターネット接続なしでも遊べます。</p></section>
 </aside>
 </div>
 </div></div>
@@ -939,7 +946,7 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 <button id="mobileMenuOverview">▢ 盤面全体をみる</button>
 <button data-proxy="export"><span class="uiicon icon-camera" aria-hidden="true"></span>画像を保存</button>
 </div>
-<div class="sheet-section"><label class="switch"><input id="mobileGuide" type="checkbox" checked>おてほんの形を表示</label><label class="switch"><input id="mobileSound" type="checkbox" checked>ぴたっとくっつく音</label></div>
+<div class="sheet-section"><label class="switch"><input id="mobileGuide" type="checkbox" checked>おてほんの形を表示</label><label class="switch"><input id="mobileSound" type="checkbox" checked>ぴたっとくっつく音</label><label class="texture-setting" for="pieceTextureMobile"><span class="texture-setting-label">ピースのしつかん</span><select id="pieceTextureMobile" aria-label="ピースのしつかん"><option value="toy">いつもの</option><option value="origami">おりがみ</option></select></label></div>
 <details class="menu-help"><summary><span class="uiicon icon-bulb" aria-hidden="true"></span>操作のヒントを見る</summary><div class="menu-help-body"><p>小さいピースは約0.3秒長押しすると、指で隠さずに動かせます。選択中の「<span class="uiicon icon-search" aria-hidden="true"></span>近づく」で拡大できます。</p><p>空白を1本指でなぞると盤面を移動、2本指で拡大・縮小できます。作品は自動保存されます。</p></div></details>
 </section>
 
@@ -1006,11 +1013,19 @@ const SHAPES=[
  {id:'square',name:'しかく',max:32,color:'#b9e64f',spec:'2.5 × 2.5cm',points:[[-UNIT/2,-UNIT/2],[UNIT/2,-UNIT/2],[UNIT/2,UNIT/2],[-UNIT/2,UNIT/2]]},
  {id:'diamond',name:'ひしがた',max:30,color:'#f4a13f',spec:'4.3 × 2.5cm',points:[[0,-UNIT/2],[UNIT*Math.sqrt(3)/2,0],[0,UNIT/2],[-UNIT*Math.sqrt(3)/2,0]]},
  {id:'isos',name:'ちょっかくさんかく',max:40,color:'#4db8b8',spec:'商品写真の直角二等辺形',points:[[-UNIT/2,-UNIT/2],[UNIT/2,-UNIT/2],[UNIT/2,UNIT/2]]},
- {id:'slim',name:'ほそひしがた',max:32,color:'#49a87a',spec:'4.8 × 1.3cm',points:[[0,-UNIT*Math.sin(Math.PI/12)],[UNIT*Math.cos(Math.PI/12),0],[0,UNIT*Math.sin(Math.PI/12)],[-UNIT*Math.cos(Math.PI/12),0]]}
+ {id:'slim',name:'ほそひしがた',max:32,color:'#49a87a',spec:'4.8 × 1.3cm',points:[[0,-UNIT*Math.sin(Math.PI/12)],[UNIT*Math.cos(Math.PI/12),0],[0,UNIT*Math.sin(Math.PI/12)],[-UNIT*Math.cos(Math.PI/12),0]]},
+ // 正五角形は1辺54＝ほかの基本形と共通。上向きの頂点がある正五角形。
+ {id:'pent',name:'ごかく',max:20,color:'#f08bb0',spec:'1辺2.5cmの正五角形',points:Array.from({length:5},(_,i)=>{const radius=UNIT/(2*Math.sin(Math.PI/5)),a=(-90+i*72)*Math.PI/180;return [radius*Math.cos(a),radius*Math.sin(a)]})},
+ // 正方形(54×54)をちょうど二つに切った長方形(27×54)。
+ {id:'tall',name:'たてなが',max:32,color:'#789ed9',spec:'1.25 × 2.5cm',points:[[-UNIT/4,-UNIT/2],[UNIT/4,-UNIT/2],[UNIT/4,UNIT/2],[-UNIT/4,UNIT/2]]},
+ // 底辺27＝たてながの短辺、ほかの2辺108＝ろっかくの1辺54の2倍。
+ // 頂点から底辺への高さは三平方の定理で決定し、図形の重心を原点にする。
+ {id:'thintri',name:'ほそさんかく',max:40,color:'#f18d73',spec:'底辺1.25cm・ほかの2辺5.0cm',points:(()=>{const h=Math.sqrt((2*UNIT)**2-(UNIT/4)**2);return [[-UNIT/4,h/3],[UNIT/4,h/3],[0,-2*h/3]]})()}
 ];
 // すべて反時計回りの頂点列にそろえる。辺の外側へ新しいピースを接続するため。
 for(const shape of SHAPES){const v=shape.points;if(v.reduce((sum,p,i)=>sum+p[0]*v[(i+1)%v.length][1]-v[(i+1)%v.length][0]*p[1],0)<0)v.reverse()}
 const SHAPE=Object.fromEntries(SHAPES.map(s=>[s.id,s]));
+const TOTAL_PIECES=SHAPES.reduce((sum,shape)=>sum+shape.max,0);
 const edgeList=(points,kind)=>points.map((a,i)=>[a,points[(i+1)%points.length],i]).filter(([a,b,i])=>kind!=='fan'||i===0||i===points.length-1);
 function attachExact(parent,type,parentEdge,childEdge=0,slot=0){
  const pp=rotatePoints(parent.type,parent.rot,parent.x,parent.y), pe=edgeList(pp,parent.type)[parentEdge];
@@ -1123,11 +1138,11 @@ const $=id=>document.getElementById(id),svg=$('board'),layer=$('piecesLayer'),ta
 const THEME_STORE='pitatorie_theme_v8',ALBUM_STORE='pitatorie_album_v8';
 const DEFAULT_COLORS=Object.fromEntries(SHAPES.map(s=>[s.id,s.color]));
 const THEMES=[
- {id:'classic',name:'いつものおもちゃ',desc:'今までのカラフルなピース',colors:['#8064c7','#378bbd','#f9c943','#ee6767','#b9e64f','#f4a13f','#4db8b8','#49a87a']},
- {id:'pastel',name:'ふんわりパステル',desc:'やわらかな絵本の色',colors:['#bca9ed','#91c9eb','#ffe49b','#f2a8b7','#c9eba3','#f8c79a','#a4ded5','#a6d2b6']},
- {id:'candy',name:'キャンディポップ',desc:'元気で甘いお菓子の色',colors:['#b066e7','#26b1e0','#ffda36','#ff6199','#9ce13d','#ffa047','#32cfc4','#5cc26b']},
- {id:'jewel',name:'きらめきジュエル',desc:'深みのある宝石カラー',colors:['#7345b6','#2369b3','#f5b82c','#d74f74','#78b849','#db8b29','#238f9d','#268168']},
- {id:'wood',name:'ぬくもりウッド',desc:'あたたかな木の玩具カラー',colors:['#a07a9f','#849faf','#cfa35d','#c98b80','#a0b081','#c69066','#7caeaa','#85976a']}
+ {id:'classic',name:'いつものおもちゃ',desc:'今までのカラフルなピース',colors:['#8064c7','#378bbd','#f9c943','#ee6767','#b9e64f','#f4a13f','#4db8b8','#49a87a','#f08bb0','#789ed9','#f18d73']},
+ {id:'pastel',name:'ふんわりパステル',desc:'やわらかな絵本の色',colors:['#bca9ed','#91c9eb','#ffe49b','#f2a8b7','#c9eba3','#f8c79a','#a4ded5','#a6d2b6','#f2b6d0','#b2c8eb','#f8baa5']},
+ {id:'candy',name:'キャンディポップ',desc:'元気で甘いお菓子の色',colors:['#b066e7','#26b1e0','#ffda36','#ff6199','#9ce13d','#ffa047','#32cfc4','#5cc26b','#ff6bb6','#6e8fea','#ff8869']},
+ {id:'jewel',name:'きらめきジュエル',desc:'深みのある宝石カラー',colors:['#7345b6','#2369b3','#f5b82c','#d74f74','#78b849','#db8b29','#238f9d','#268168','#c54d88','#5478ce','#cf6a55']},
+ {id:'wood',name:'ぬくもりウッド',desc:'あたたかな木の玩具カラー',colors:['#a07a9f','#849faf','#cfa35d','#c98b80','#a0b081','#c69066','#7caeaa','#85976a','#b88598','#8197b1','#bd8b73']}
 ];
 
 // Paint colors are optional piece properties, independent from the 5 default shape themes.
@@ -1140,6 +1155,16 @@ const PAINT_COLORS=[
  ['red','#B95350','あか'],['deepgreen','#39745C','ふかみどり'],['navy','#466A9A','こんいろ'],['charcoal','#515263','チャコール']
 ].map(([id,hex,name])=>({id,hex,name}));
 const PAINT_BY_ID=Object.fromEntries(PAINT_COLORS.map(c=>[c.id,c]));
+// Material style is a local display preference, independent from piece color and geometry.
+const PIECE_TEXTURE_PREF='pitatorie_piece_texture_v1';
+let pieceTexture='toy';
+try{if(localStorage.getItem(PIECE_TEXTURE_PREF)==='origami')pieceTexture='origami'}catch(_){}
+function setPieceTexture(value){
+ pieceTexture=value==='origami'?'origami':'toy';
+ for(const id of ['pieceTextureDesktop','pieceTextureMobile']){const el=$(id);if(el)el.value=pieceTexture}
+ try{localStorage.setItem(PIECE_TEXTURE_PREF,pieceTexture)}catch(_){}
+ renderPieces();
+}
 const PAINT_PREF='pitatorie_paint_preferences_v1';
 let paintingActive=false,paintSelectedId='coral',paintAction='one',paintExpanded=false,paintRecent=['coral','yellow','mint','blue','pink','lime','violet','cream'];
 try{const d=JSON.parse(localStorage.getItem(PAINT_PREF)||'{}');if(PAINT_BY_ID[d.selected])paintSelectedId=d.selected;if(Array.isArray(d.recent))paintRecent=[...new Set(d.recent.filter(x=>PAINT_BY_ID[x]))].slice(0,8)}catch(_){}
@@ -1175,7 +1200,7 @@ function uniquePieceIds(arr){
  return arr;
 }
 let saveFailed=false,lastSaveAlert=-Infinity;
-function markSaveStatus(){const statusEl=$('status');if(statusEl)statusEl.textContent=`${pieces.length} / 256 ピース${saveFailed?' ・ ⚠ 保存できていません':''}`;}
+function markSaveStatus(){const statusEl=$('status');if(statusEl)statusEl.textContent=`${pieces.length} / ${TOTAL_PIECES} ピース${saveFailed?' ・ ⚠ 保存できていません':''}`;}
 function save(){
  if(mode==='free')freePieces=clone(pieces);else puzzleBoards[level]=clone(pieces);
  try{
@@ -1195,7 +1220,7 @@ function load(){try{
   x.freePieces=remap(x.freePieces??(x.mode==='free'?x.pieces:[]));
   x.pieces=remap(x.pieces);x.puzzleBoards={};x.complete=[];x.mode='free';x.level=0;
  }
-mode=x.mode==='puzzle'?'puzzle':'free';level=Math.max(0,Math.min(levels.length-1,Number(x.level)||0));const sanitize=a=>uniquePieceIds(Array.isArray(a)?a.filter(p=>p&&SHAPE[p.type]&&Number.isFinite(p.x)&&Number.isFinite(p.y)).slice(0,256).map(p=>({...p,rot:Number.isFinite(p.rot)?p.rot:0})):[]);freePieces=sanitize(x.freePieces??(mode==='free'?x.pieces:[]));puzzleBoards={};for(const [k,v] of Object.entries(x.puzzleBoards||{})){const i=Number(k);if(Number.isInteger(i)&&i>=0&&i<levels.length)puzzleBoards[i]=sanitize(v)}if(mode==='puzzle'&&!x.puzzleBoards)puzzleBoards[level]=sanitize(x.pieces);pieces=clone(mode==='free'?freePieces:(puzzleBoards[level]||[]));nextId=Math.max(Number(x.nextId)||1,freePieces.reduce((m,p)=>Math.max(m,p.id+1),1),...Object.values(puzzleBoards).map(a=>a.reduce((m,p)=>Math.max(m,p.id+1),1)));completeSet=new Set(x.complete||[]);guide=x.guide!==false;sound=x.sound!==false;grabMode=x.grabMode==='group'?'group':'single';freeBoardSize=boardSizeForArt(freePieces,x.freeBoardSize||'medium');colorShareSession=x.colorShareSession?.active===true&&x.colorShareSession.request?.format==='pitatorie-color-exchange'?x.colorShareSession:null;}catch(e){}}
+mode=x.mode==='puzzle'?'puzzle':'free';level=Math.max(0,Math.min(levels.length-1,Number(x.level)||0));const sanitize=a=>uniquePieceIds(Array.isArray(a)?a.filter(p=>p&&SHAPE[p.type]&&Number.isFinite(p.x)&&Number.isFinite(p.y)).slice(0,TOTAL_PIECES).map(p=>({...p,rot:Number.isFinite(p.rot)?p.rot:0})):[]);freePieces=sanitize(x.freePieces??(mode==='free'?x.pieces:[]));puzzleBoards={};for(const [k,v] of Object.entries(x.puzzleBoards||{})){const i=Number(k);if(Number.isInteger(i)&&i>=0&&i<levels.length)puzzleBoards[i]=sanitize(v)}if(mode==='puzzle'&&!x.puzzleBoards)puzzleBoards[level]=sanitize(x.pieces);pieces=clone(mode==='free'?freePieces:(puzzleBoards[level]||[]));nextId=Math.max(Number(x.nextId)||1,freePieces.reduce((m,p)=>Math.max(m,p.id+1),1),...Object.values(puzzleBoards).map(a=>a.reduce((m,p)=>Math.max(m,p.id+1),1)));completeSet=new Set(x.complete||[]);guide=x.guide!==false;sound=x.sound!==false;grabMode=x.grabMode==='group'?'group':'single';freeBoardSize=boardSizeForArt(freePieces,x.freeBoardSize||'medium');colorShareSession=x.colorShareSession?.active===true&&x.colorShareSession.request?.format==='pitatorie-color-exchange'?x.colorShareSession:null;}catch(e){}}
 function history(){hist.push({pieces:clone(pieces),selected});if(hist.length>60)hist.shift();redo=[];}
 function restore(snapshot){pieces=clone(snapshot.pieces);selected=snapshot.selected;renderAll();save()}
 function toast(str){const el=$('toast');el.textContent=str;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1800)}
@@ -1239,6 +1264,11 @@ function drawPiece(g,p,selectedFlag=false,ghost=false,groupMarked=false,prefix='
  // Selection is outside the unchanged collision shape, never part of the geometry.
  if(groupMarked){node('polygon',{points:pts,fill:'none',stroke:'#e6fff5','stroke-width':14,'stroke-linejoin':'round'},g);node('polygon',{points:pts,fill:'none',stroke:'#41bf9c','stroke-width':4,'stroke-dasharray':'7 6','stroke-linejoin':'round'},g)}
  if(selectedFlag){node('polygon',{points:pts,fill:'none',stroke:'#fff9dd','stroke-width':15,'stroke-linejoin':'round',opacity:.96},g);node('polygon',{points:pts,fill:'none',stroke:'#f9ad5a','stroke-width':4.5,'stroke-dasharray':'9 6','stroke-linejoin':'round'},g)}
+ // Origami: solid, flat paper-colored surface; the polygon itself and touch geometry are unchanged.
+ // Keep selection/group highlights and the drag-only lift shadow handled by paintPiece().
+ if(pieceTexture==='origami'){
+  return node('polygon',{points:pts,fill:baseColor,stroke:tone(baseColor,'black',.32),'stroke-width':1.8,'stroke-linejoin':'round'},g);
+ }
  const face=node('polygon',{points:pts,fill:`url(#${faceId})`,stroke:tone(baseColor,'black',.18),'stroke-width':2.8,'stroke-linejoin':'round'},g);
  node('polygon',{points:pts,fill:`url(#${glowId})`,stroke:'none'},g);
  // Inner bevel: cut to original silhouette, so neighboring tiles still meet exactly.
@@ -1273,8 +1303,10 @@ function status(){const paintUndo=$('paintUndo');if(paintUndo)paintUndo.disabled
 function renderAll(){invalidateSpatial();drawTarget();snapLayer.replaceChildren();deco.replaceChildren();renderPieces();status()}
 buildMaterialDefs($('pieceMaterials'),SHAPES,'toy');buildPaintMaterialDefs($('pieceMaterials'));
 function buildPalette(){palette.replaceChildren();for(const s of SHAPES){const b=document.createElement('button');b.type='button';b.className='typebtn';b.dataset.type=s.id;b.title=`${s.name} / ${s.spec} / ${s.max}まい`;const icon=document.createElementNS(NS,'svg');const xs=s.points.map(p=>p[0]),ys=s.points.map(p=>p[1]);
- const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
- const pad=7;icon.setAttribute('viewBox',`${minx-pad} ${miny-pad} ${maxx-minx+pad*2} ${maxy-miny+pad*2}`);node('polygon',{points:polygonPoints(s.id),fill:s.color,stroke:'#fff','stroke-width':'4', 'stroke-linejoin':'round'},icon);b.appendChild(icon);const label=document.createElement('span');label.textContent=s.name;b.appendChild(label);const count=document.createElement('span');count.className='count';count.textContent=s.max;b.appendChild(count);b.addEventListener('click',()=>{addPiece(s.id);closeMobileSheet()});palette.appendChild(b)}}
+ const displayPoints=s.id==='thintri'?s.points.map(([x,y])=>[-y,x]):s.points;
+ const dx=displayPoints.map(p=>p[0]),dy=displayPoints.map(p=>p[1]);
+ const minx=Math.min(...dx),maxx=Math.max(...dx),miny=Math.min(...dy),maxy=Math.max(...dy);
+ const pad=7;icon.setAttribute('viewBox',`${minx-pad} ${miny-pad} ${maxx-minx+pad*2} ${maxy-miny+pad*2}`);node('polygon',{points:displayPoints.map(p=>p.join(',')).join(' '),fill:s.color,stroke:'#fff','stroke-width':'4', 'stroke-linejoin':'round'},icon);b.appendChild(icon);const label=document.createElement('span');if(s.id==='thintri')label.innerHTML='ほそ<wbr>さんかく';else label.textContent=s.name;b.appendChild(label);const count=document.createElement('span');count.className='count';count.textContent=s.max;b.appendChild(count);b.addEventListener('click',()=>{addPiece(s.id);closeMobileSheet()});palette.appendChild(b)}}
 // 新しく取り出したピースは、できるだけほかのピースと重ならない場所へ。
 function findSpawn(type,preferX,preferY){
  const probe={id:-1,type,x:preferX,y:preferY,rot:0};
@@ -1565,7 +1597,7 @@ function findFreeSnap(p,ignored=new Set(),validator=null,preferred=null){
 }
 // おてほんの回転判定は見た目の一致を優先する。
 // 正方形90度・正三角形120度・六角形60度・ひし形180度は同じ輪郭。
-const ROT_PERIOD={square:90,tri:120,hex:60,diamond:180,slim:180};
+const ROT_PERIOD={square:90,tri:120,hex:60,diamond:180,slim:180,pent:72,tall:180};
 function goalRotationGap(type,a,b){
  const period=ROT_PERIOD[type]||360;
  const d=((a-b)%period+period*1.5)%period-period/2;
@@ -1828,7 +1860,7 @@ IDEAS.push(...[["いきものと自然","森の番人のフクロウ","大きな
 try{const a=JSON.parse(localStorage.getItem(ALBUM_STORE)||'[]');if(Array.isArray(a))album=a.filter(v=>v&&Array.isArray(v.pieces)&&typeof v.name==='string')}catch(e){}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function putAlbum(){try{localStorage.setItem(ALBUM_STORE,JSON.stringify(album));return true}catch(e){toast('保存領域が足りないみたい');return false}}
-function artSvg(a){const th=themeObject(a.theme);const b=boundsFor(a.boardSize||'medium');const list=a.pieces.slice(0,256).filter(p=>SHAPE[p.type]);
+function artSvg(a){const th=themeObject(a.theme);const b=boundsFor(a.boardSize||'medium');const list=a.pieces.slice(0,TOTAL_PIECES).filter(p=>SHAPE[p.type]);
  const content=list.map(p=>{const s=SHAPE[p.type],n=SHAPES.findIndex(x=>x.id===p.type);return '<polygon points="'+polygonPoints(s.id)+'" transform="translate('+Number(p.x)+' '+Number(p.y)+') rotate('+Number(p.rot||0)+')" fill="'+(PAINT_BY_ID[p.paintId]?.hex||th.colors[n])+'" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>'}).join('');
  return '<svg viewBox="'+b.x+' '+b.y+' '+b.w+' '+b.h+'" role="img" aria-label="'+esc(a.name)+'の作品"><rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" fill="#fffaf0"/>'+content+'</svg>';
 }
@@ -1907,7 +1939,7 @@ function exchangeCleanPiece(p){const id=Number(p?.id),x=Number(p?.x),y=Number(p?
 }
 function exchangeValidate(raw){
  if(!raw||raw.format!==COLOR_EXCHANGE_FORMAT||raw.version!==1||!['request','colored'].includes(raw.kind))throw Error('ピタトリエのぬりえファイルではありません');
- if(!Array.isArray(raw.pieces)||!raw.pieces.length||raw.pieces.length>256)throw Error('ピース数が正しくありません');
+ if(!Array.isArray(raw.pieces)||!raw.pieces.length||raw.pieces.length>TOTAL_PIECES)throw Error('ピース数が正しくありません');
  const counts={},ids=new Set(),pieces=raw.pieces.map(exchangeCleanPiece),size=normalSize(raw.boardSize);
  if(raw.boardSize!==size)throw Error('盤面サイズが正しくありません');
  for(const p of pieces){if(ids.has(p.id))throw Error('ピース番号が重複しています');ids.add(p.id);counts[p.type]=(counts[p.type]||0)+1;if(counts[p.type]>SHAPE[p.type].max)throw Error('使えるピース枚数を超えています');if(!withinBoardAt(p,size))throw Error('盤面からはみ出したピースがあります')}
@@ -2117,7 +2149,7 @@ function renderFeature(){
     id:String(Date.now())+'-'+Math.random().toString(36).slice(2),name:a.name.slice(0,32),
     date:Number(a.date)||Date.now(),theme:themeObject(a.theme).id,
     boardSize:normalSize(a.boardSize||'medium'),favorite:a.favorite===true,...(a.colorExchange&&typeof a.colorExchange==='object'?{colorExchange:{kind:'colored',exchangeId:String(a.colorExchange.exchangeId||'').slice(0,90),maker:String(a.colorExchange.maker||'').slice(0,24),coloredBy:String(a.colorExchange.coloredBy||'').slice(0,24)}}:{}),
-    pieces:a.pieces.slice(0,256).filter(p=>SHAPE[p?.type]&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&Number.isFinite(p.rot)).map(p=>({id:Number(p.id)||0,type:p.type,x:p.x,y:p.y,rot:p.rot,...(PAINT_BY_ID[p.paintId]?{paintId:p.paintId}:{})}))
+    pieces:a.pieces.slice(0,TOTAL_PIECES).filter(p=>SHAPE[p?.type]&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&Number.isFinite(p.rot)).map(p=>({id:Number(p.id)||0,type:p.type,x:p.x,y:p.y,rot:p.rot,...(PAINT_BY_ID[p.paintId]?{paintId:p.paintId}:{})}))
    }));
    if(!incoming.length)throw Error('読み込める作品がありません');
    if(!confirm(incoming.length+'作品を今のアルバムに追加しますか？'))return;
@@ -2470,6 +2502,10 @@ svg.addEventListener('pointermove',e=>{
 },{capture:true});
 svg.addEventListener('pointerup',endPaintStroke,{capture:true});svg.addEventListener('pointercancel',endPaintStroke,{capture:true});
 
+for(const id of ['pieceTextureDesktop','pieceTextureMobile']){
+ const control=$(id);control.value=pieceTexture;
+ control.addEventListener('change',e=>setPieceTexture(e.target.value));
+}
 load();buildPalette();applyTheme(chosenTheme);$('sound').checked=sound;showMode(mode);changeLevelInitial();arrangeMobile();if(colorShareSession?.active&&mode==='free'){const recovered=colorShareSession;try{exchangeValidate(recovered.request);setPainting(true);save();}catch(e){colorShareSession=null;setPainting(false);toast('交換データを確認できませんでした')}}
 function changeLevelInitial(){$('levelnum').textContent=String(level+1).padStart(2,'0')+' / '+levels.length;$('taskname').textContent=levels[level].name;renderAll()}
 })();
