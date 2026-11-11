@@ -1503,7 +1503,10 @@ function drawTarget(){target.replaceChildren();if(mode!=='puzzle')return;const l
 function status(){const paintUndo=$('paintUndo');if(paintUndo)paintUndo.disabled=hist.length===0;const focusButton=$('mobileFocusSelected');if(focusButton)focusButton.hidden=(selected==null||!pieces.some(p=>p.id===selected));const left=SHAPES.map(s=>({id:s.id,rest:s.max-pieces.filter(p=>p.type===s.id).length}));for(const b of palette.children){const s=left.find(s=>s.id===b.dataset.type);if(s)b.querySelector('.count').textContent=s.rest} markSaveStatus();let selectedPiece=pieces.find(p=>p.id===selected);for(const id of ['rotateLeft','rotateRight','deleteOne'])$(id).disabled=!selectedPiece;$('undo').disabled=hist.length===0;$('redo').disabled=redo.length===0;syncMobileButtons();if(mode==='puzzle')checkGoal();updateGrabMode()}
 function renderAll(){invalidateSpatial();drawTarget();snapLayer.replaceChildren();deco.replaceChildren();renderPieces();status()}
 buildMaterialDefs($('pieceMaterials'),SHAPES,'toy');buildPaintMaterialDefs($('pieceMaterials'));
-function buildPalette(){palette.replaceChildren();for(const s of SHAPES){const b=document.createElement('button');b.type='button';b.className='typebtn';b.dataset.type=s.id;b.title=`${s.name} / ${s.spec} / ${s.max}まい`;const icon=document.createElementNS(NS,'svg');const xs=s.points.map(p=>p[0]),ys=s.points.map(p=>p[1]);
+// v9.38: presentation order only. Keep SHAPES in its original order so color sets,
+// saved artwork, limits, puzzle data, and every index-based lookup remain stable.
+const PALETTE_ORDER=['tri','isos','thintri','trap','square','tall','diamond','slim','pent','hex','semi','fan'];
+function buildPalette(){palette.replaceChildren();for(const type of PALETTE_ORDER){const s=SHAPE[type];const b=document.createElement('button');b.type='button';b.className='typebtn';b.dataset.type=s.id;b.title=`${s.name} / ${s.spec} / ${s.max}まい`;const icon=document.createElementNS(NS,'svg');const xs=s.points.map(p=>p[0]),ys=s.points.map(p=>p[1]);
  const displayPoints=s.id==='thintri'?s.points.map(([x,y])=>[-y,x]):s.points;
  const dx=displayPoints.map(p=>p[0]),dy=displayPoints.map(p=>p[1]);
  const minx=Math.min(...dx),maxx=Math.max(...dx),miny=Math.min(...dy),maxy=Math.max(...dy);
