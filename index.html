@@ -1531,7 +1531,27 @@ function findSpawn(type,preferX,preferY){
   if(!withinFullBoard(probe))continue;
   if(!hasOverlap(probe))return {x,y};
   const count=overlapCount(probe);if(count<smallest){smallest=count;fallback={x,y}};
- }}return null;
+ }}
+ // All radial candidates may be occupied even though there are usable gaps elsewhere.
+ // Scan the entire board as a fallback; use a staggered grid to fill those gaps.
+ const vertices=SHAPE[type].points;
+ const minX=b.left+22-Math.min(...vertices.map(v=>v[0]));
+ const maxX=b.right-22-Math.max(...vertices.map(v=>v[0]));
+ const minY=b.top+22-Math.min(...vertices.map(v=>v[1]));
+ const maxY=b.bottom-22-Math.max(...vertices.map(v=>v[1]));
+ const step=18,candidates=[];
+ for(let y=minY,row=0;y<=maxY;y+=step,row++){
+  const shift=(row%2)*step/2;
+  for(let x=minX+shift;x<=maxX;x+=step){
+   candidates.push({x,y,d:(x-preferX)**2+(y-preferY)**2});
+  }
+ }
+ candidates.sort((a,b)=>a.d-b.d);
+ for(const candidate of candidates){
+  probe.x=candidate.x;probe.y=candidate.y;
+  if(!hasOverlap(probe))return {x:probe.x,y:probe.y};
+ }
+ return null;
 }
 function addPiece(type){if(colorShareSession){toast('ぬりえ交換では色だけ塗れるよ');return;}
 
@@ -1940,6 +1960,7 @@ function rotate(amt){if(colorShareSession||paintingActive)return;
  if(members.length===1){
   const candidate={...p,rot:((p.rot+amt)%360+360)%360};
   // 1枚だけの回転でも、ほかのピースと重ねない。
+  if(!withinFullBoard(candidate)){toast('盤面からはみ出すので、まわせないよ');return}
   if(hasOverlap(candidate)){toast('ほかのピースに かさなるよ');return}
   history();p.rot=candidate.rot;const found=findSnap(p);if(found){p.x=found.x;p.y=found.y;p.rot=((found.rot%360)+360)%360}
   renderAll();if(found)burst(p,found.kind);save();if(found)snapSound();else blip();return;
@@ -2432,17 +2453,37 @@ function renderFeature(){
    if(f.size>6_000_000)throw Error('ファイルが大きすぎます');
    const data=JSON.parse(await f.text());
    if(data.format!=='pitatorie-album'||!Array.isArray(data.works))throw Error('ピタトリエのアルバムではありません');
-   const incoming=data.works.filter(a=>a&&typeof a.name==='string'&&Array.isArray(a.pieces)).slice(0,500).map(a=>({
+   const originals=data.works.filter(a=>a&&typeof a.name==='string'&&Array.isArray(a.pieces)).slice(0,500);
+   const incoming=originals.map(a=>({
     id:String(Date.now())+'-'+Math.random().toString(36).slice(2),name:a.name.slice(0,32),
     date:Number(a.date)||Date.now(),theme:themeObject(a.theme).id,
     boardSize:normalSize(a.boardSize||'medium'),favorite:a.favorite===true,...(a.colorExchange&&typeof a.colorExchange==='object'?{colorExchange:{kind:'colored',exchangeId:String(a.colorExchange.exchangeId||'').slice(0,90),maker:String(a.colorExchange.maker||'').slice(0,24),coloredBy:String(a.colorExchange.coloredBy||'').slice(0,24)}}:{}),
     pieces:a.pieces.slice(0,TOTAL_PIECES).filter(p=>SHAPE[p?.type]&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&Number.isFinite(p.rot)).map(p=>({id:Number(p.id)||0,type:p.type,x:p.x,y:p.y,rot:p.rot,...(PAINT_BY_ID[p.paintId]?{paintId:p.paintId}:{})}))
    }));
-   if(!incoming.length)throw Error('読み込める作品がありません');
-   if(!confirm(incoming.length+'作品を今のアルバムに追加しますか？'))return;
-   const before=album;album=album.concat(incoming);
+   // Reject only malformed imported works; intact older works can grow to a larger board.
+   const verified=incoming.filter((a,index)=>{
+    if(!a.pieces.length||a.pieces.length!==originals[index].pieces.length)return false;
+    const counts={};
+    for(const p of a.pieces){
+     counts[p.type]=(counts[p.type]||0)+1;
+     if(counts[p.type]>SHAPE[p.type].max||Math.abs(p.rot)>36000)return false;
+    }
+    uniquePieceIds(a.pieces);
+    a.boardSize=boardSizeForArt(a.pieces,a.boardSize);
+    if(a.pieces.some(p=>!withinBoardAt(p,a.boardSize)))return false;
+    for(let i=0;i<a.pieces.length;i++)for(let j=i+1;j<a.pieces.length;j++){
+     const p=a.pieces[i],q=a.pieces[j];
+     if(Math.hypot(p.x-q.x,p.y-q.y)>pieceRadius(p)+pieceRadius(q)+3)continue;
+     if(polygonsOverlap(rotatePoints(p.type,p.rot,p.x,p.y),rotatePoints(q.type,q.rot,q.x,q.y)))return false;
+    }
+    return true;
+   });
+   const skipped=originals.length-verified.length;
+   if(!verified.length)throw Error('正しい配置の作品がありません。元のバックアップを確認してください');
+   if(!confirm(verified.length+'作品を今のアルバムに追加しますか？'+(skipped?'\n不正な配置の'+skipped+'作品は読み飛ばします。':'')))return;
+   const before=album;album=album.concat(verified);
    if(!putAlbum()){album=before;return}
-   toast(incoming.length+'作品を読み込んだよ');renderFeature();
+   toast(verified.length+'作品を読み込んだよ'+(skipped?'（'+skipped+'作品は読み飛ばし）':''));renderFeature();
   }catch(err){alert('読み込めませんでした：'+err.message)}
  };
  $('albumSave').onclick=()=>{
