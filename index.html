@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#ffefd5">
-<title>ピタトリエ v9.18 — つくる・あつめる・ひらめく</title>
+<title>ピタトリエ v9.19 — つくる・あつめる・ひらめく</title>
 <style>
 :root{font-family:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;color:#33465b;--ink:#34465b;--soft:#6e7e8e;--peach:#ff8d86;--mint:#7fd3c3;--cream:#fff8ed;--shadow:0 7px 0 #dfd9d0,0 10px 28px #8c85801b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{background:#f8f1e7}body{margin:0;background:radial-gradient(circle at 17% 2%,#ffeadb 0,transparent 31%),radial-gradient(circle at 98% 20%,#e3f7f0 0,transparent 42%),linear-gradient(180deg,#fff9ef,#f9f0e6);min-height:100dvh;overscroll-behavior-y:contain}
@@ -548,7 +548,7 @@ body[data-mode="puzzle"] .canvas-size-picker,body[data-mode="puzzle"] #boardOver
  .album-viewer{padding:4px}.album-viewer-dialog{width:100%;height:calc(100dvh - 8px);border-radius:15px}
  .album-viewer-head{min-height:54px;padding:7px 9px}.album-viewer-head .album-viewer-title{font-size:16px}
  .album-viewer-stage{padding:7px}
- .album-viewer-actions{gap:5px}.album-viewer-actions button{font-size:12px;padding:7px 2px}
+ .album-viewer-actions{grid-template-columns:.85fr 1.35fr .85fr .95fr;gap:5px}.album-viewer-actions button{font-size:12px;padding:7px 2px}
 }
 @media(max-height:470px) and (orientation:landscape){
  .album-viewer-dialog{height:calc(100dvh - 8px)}.album-viewer-head{min-height:46px;padding:4px 10px}.album-viewer-foot{padding:4px 8px 6px}.album-viewer-meta{margin-bottom:3px}.album-viewer-actions button{min-height:38px}
@@ -944,7 +944,7 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
     <div class="album-viewer-head"><strong id="albumViewerTitle" class="album-viewer-title">作品をながめる</strong><button id="albumViewerClose" type="button" aria-label="鑑賞を閉じる">×</button></div>
     <div class="album-viewer-stage" id="albumViewerStage"><div class="album-viewer-art" id="albumViewerArt"></div></div>
     <div class="album-viewer-foot"><div class="album-viewer-meta" id="albumViewerMeta"></div>
-      <div class="album-viewer-actions"><button id="albumViewerPrev" type="button">◀ 前へ</button><button id="albumViewerFav" type="button" aria-pressed="false">♡ 好き</button><button id="albumViewerNext" type="button">次へ ▶</button><button id="albumViewerEdit" type="button" class="primary">✎ 編集</button></div>
+      <div class="album-viewer-actions"><button id="albumViewerPrev" type="button">◀ 前へ</button><button id="albumViewerFav" type="button" aria-pressed="false" aria-label="お気に入りに登録">お気に入り</button><button id="albumViewerNext" type="button">次へ ▶</button><button id="albumViewerEdit" type="button" class="primary">✎ 編集</button></div>
     </div>
   </section>
 </div>
@@ -1854,7 +1854,8 @@ function renderAlbumViewer(){
  $('albumViewerArt').innerHTML=artSvg(a);
  $('albumViewerArt').firstElementChild?.setAttribute('aria-label',a.name+'の作品（全画面）');
  $('albumViewerMeta').textContent='作成日：'+artDate(a)+' ・ '+a.pieces.length+'ピース ・ '+(i>=0?(i+1)+' / '+list.length+'作品':'お気に入り');
- $('albumViewerFav').textContent=a.favorite===true?'♥ お気に入り':'♡ お気に入り';
+ $('albumViewerFav').textContent='お気に入り';
+ $('albumViewerFav').setAttribute('aria-label',a.favorite===true?'お気に入りを解除':'お気に入りに登録');
  $('albumViewerFav').setAttribute('aria-pressed',String(a.favorite===true));
  $('albumViewerPrev').disabled=i<=0;$('albumViewerNext').disabled=i<0||i>=list.length-1;
  $('albumViewerStage').scrollTop=0;$('albumViewerStage').scrollLeft=0;
