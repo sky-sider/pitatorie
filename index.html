@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#ffefd5">
-<title>ピタトリエ v9.61 — つくる・ぬる・ひらめく</title>
+<title>ピタトリエ v9.62 — つくる・ぬる・ひらめく</title>
 <style>
 :root{font-family:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;color:#33465b;--ink:#34465b;--soft:#6e7e8e;--peach:#ff8d86;--mint:#7fd3c3;--cream:#fff8ed;--shadow:0 7px 0 #dfd9d0,0 10px 28px #8c85801b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{background:#f8f1e7}body{margin:0;background:radial-gradient(circle at 17% 2%,#ffeadb 0,transparent 31%),radial-gradient(circle at 98% 20%,#e3f7f0 0,transparent 42%),linear-gradient(180deg,#fff9ef,#f9f0e6);min-height:100dvh;overscroll-behavior-y:contain}
@@ -326,6 +326,16 @@ body[data-mode="puzzle"] .canvas-size-picker,body[data-mode="puzzle"] #boardOver
  .mobile-sheet #palette .typebtn svg{width:100%;max-width:68px;height:44px;filter:none}
  .mobile-sheet #palette .count{padding:2px 4px;font-size:9px}
  .sheet-help{font-size:11px;font-weight:750;color:#84624f;line-height:1.55;margin:0}
+ .piece-quick-controls{display:flex;flex-direction:column;gap:8px;padding:9px;border:2px solid #dcd0ee;border-radius:15px;background:#fffdfc}
+ .piece-count-chooser{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+ .piece-count-chooser>span{font-size:12px;font-weight:950;color:#6d5486;margin-right:auto}
+ .piece-count-chooser button{border:2px solid #d5c7e9;background:#fff;color:#765a91;font-size:12px;font-weight:950;border-radius:10px;padding:5px 10px;min-width:51px;min-height:36px}
+ .piece-count-chooser button[aria-pressed="true"]{background:#e8dbfc;border-color:#ab90d2;color:#513574;box-shadow:inset 0 0 0 1px #fff}
+ .piece-continuous{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:950;color:#694c83;cursor:pointer;flex-wrap:wrap}
+ .piece-continuous input{width:20px;height:20px;accent-color:#9774ca;flex:none;margin:0}
+ .piece-continuous small{color:#8e779f;font-size:10px;font-weight:750}
+ .piece-feedback{margin:0;color:#72598a;font-size:11px;font-weight:850;min-height:1.35em}
+
  .mobile-toolgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
  .mobile-toolgrid button{min-height:44px;text-align:left;padding:10px;background:#fffbf2;border:2px solid #e7cfad;color:#7f4c36;border-radius:13px;font-size:12px;font-weight:1000;box-shadow:0 3px 0 #d1b08a}
  .mobile-sheet .switch{font-size:13px;line-height:1.6}
@@ -1133,8 +1143,13 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 <div id="mobileSheetBackdrop" class="mobile-sheet-backdrop" aria-hidden="true"></div>
 <section id="mobilePaletteSheet" class="mobile-sheet pieces-sheet" role="dialog" aria-modal="true" aria-label="ピースのおもちゃばこ" aria-hidden="true">
 <div class="sheet-head"><span><span class="uiicon icon-basket" aria-hidden="true"></span>ピースのおもちゃばこ</span><button class="close-sheet" aria-label="閉じる">×</button></div>
+<div class="piece-quick-controls">
+ <div class="piece-count-chooser" role="group" aria-label="1回で取り出す枚数"><span>1回で取り出す数</span><button type="button" data-piece-batch="1" aria-pressed="true">1枚</button><button type="button" data-piece-batch="3" aria-pressed="false">3枚</button><button type="button" data-piece-batch="5" aria-pressed="false">5枚</button></div>
+ <label class="piece-continuous"><input type="checkbox" id="mobilePieceContinuous">つづけて出す <small>（タップしてもおもちゃ箱を閉じない）</small></label>
+ <p id="mobilePieceFeedback" class="piece-feedback" role="status" aria-live="polite">好きな形をタップして取り出そう！</p>
+</div>
 <div id="mobilePaletteSlot"></div>
-<p class="sheet-help">タップしてピースを追加。選ぶとボードに戻ります。盤面の空白をなぞると移動、2本指で拡大・縮小できます。</p>
+<p class="sheet-help">出したピースは空いている場所に置かれます。3枚・5枚は一度に追加でき、「もどす」でまとめて取り消せます。</p>
 </section>
 <section id="mobileToolsSheet" class="mobile-sheet" role="dialog" aria-modal="true" aria-label="アトリエのメニュー" aria-hidden="true">
 <div class="sheet-head"><span><span class="uiicon icon-gear" aria-hidden="true"></span>アトリエのメニュー</span><button class="close-sheet" aria-label="閉じる">×</button></div>
@@ -1164,7 +1179,7 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 <button data-proxy="export"><span class="uiicon icon-camera" aria-hidden="true"></span>画像を保存</button>
 </div>
 <div class="sheet-section"><label class="switch"><input id="mobileGuide" type="checkbox" checked>おてほんの形を表示</label><label class="switch"><input id="mobileSound" type="checkbox" checked>ぴたっとくっつく音</label><label class="texture-setting" for="pieceTextureMobile"><span class="texture-setting-label">ピースのしつかん</span><select id="pieceTextureMobile" aria-label="ピースのしつかん"><option value="toy">いつもの</option><option value="origami">おりがみ</option><option value="plush">ぬいぐるみ</option><option value="patchwork">パッチワーク</option></select></label></div>
-<details class="menu-help"><summary><span class="uiicon icon-bulb" aria-hidden="true"></span>操作のヒントを見る</summary><div class="menu-help-body"><p><b>同じピースをダブルタップすると、右に30°回転</b>します。下の回転ボタンもこれまでどおり使えます。</p><p>小さいピースは約0.3秒長押しすると、指で隠さずに動かせます。選択中の「<span class="uiicon icon-search" aria-hidden="true"></span>近づく」で拡大できます。</p><p>空白を1本指でなぞると盤面を移動、2本指で拡大・縮小できます。作品は自動保存されます。</p></div></details>
+<details class="menu-help"><summary><span class="uiicon icon-bulb" aria-hidden="true"></span>操作のヒントを見る</summary><div class="menu-help-body"><p>スマホのピースのおもちゃばこでは、<b>1枚・3枚・5枚</b>から取り出す数を選べます。「つづけて出す」をオンにすると、おもちゃばこを閉じずに何度でも追加できます。</p><p><b>同じピースをダブルタップすると、右に30°回転</b>します。下の回転ボタンもこれまでどおり使えます。</p><p>小さいピースは約0.3秒長押しすると、指で隠さずに動かせます。選択中の「<span class="uiicon icon-search" aria-hidden="true"></span>近づく」で拡大できます。</p><p>空白を1本指でなぞると盤面を移動、2本指で拡大・縮小できます。作品は自動保存されます。</p></div></details>
 </section>
 
 <div id="featureBackdrop" class="feature-backdrop" aria-hidden="true">
@@ -1624,11 +1639,26 @@ buildMaterialDefs($('pieceMaterials'),SHAPES,'toy');buildPaintMaterialDefs($('pi
 // v9.38: presentation order only. Keep SHAPES in its original order so color sets,
 // saved artwork, limits, puzzle data, and every index-based lookup remain stable.
 const PALETTE_ORDER=['tri','isos','thintri','trap','square','tall','diamond','slim','pent','hex','semi','fan'];
+let mobilePieceBatchCount=1, mobilePieceContinuous=false;
+function syncMobilePieceOptions(){
+ for(const b of document.querySelectorAll('[data-piece-batch]'))b.setAttribute('aria-pressed',String(Number(b.dataset.pieceBatch)===mobilePieceBatchCount));
+ const c=$('mobilePieceContinuous');if(c)c.checked=mobilePieceContinuous;
+}
+
 function buildPalette(){palette.replaceChildren();for(const type of PALETTE_ORDER){const s=SHAPE[type];const b=document.createElement('button');b.type='button';b.className='typebtn';b.dataset.type=s.id;b.title=`${s.name} / ${s.spec} / ${s.max}まい`;const icon=document.createElementNS(NS,'svg');const xs=s.points.map(p=>p[0]),ys=s.points.map(p=>p[1]);
  const displayPoints=s.id==='thintri'?s.points.map(([x,y])=>[-y,x]):s.points;
  const dx=displayPoints.map(p=>p[0]),dy=displayPoints.map(p=>p[1]);
  const minx=Math.min(...dx),maxx=Math.max(...dx),miny=Math.min(...dy),maxy=Math.max(...dy);
- const pad=7;icon.setAttribute('viewBox',`${minx-pad} ${miny-pad} ${maxx-minx+pad*2} ${maxy-miny+pad*2}`);node('polygon',{points:displayPoints.map(p=>p.join(',')).join(' '),fill:s.color,stroke:'#fff','stroke-width':'4', 'stroke-linejoin':'round'},icon);b.appendChild(icon);const label=document.createElement('span');if(s.id==='thintri')label.innerHTML='ほそ<wbr>さんかく';else label.textContent=s.name;b.appendChild(label);const count=document.createElement('span');count.className='count';count.textContent=s.max;b.appendChild(count);b.addEventListener('click',()=>{addPiece(s.id);closeMobileSheet()});palette.appendChild(b)}}
+ const pad=7;icon.setAttribute('viewBox',`${minx-pad} ${miny-pad} ${maxx-minx+pad*2} ${maxy-miny+pad*2}`);node('polygon',{points:displayPoints.map(p=>p.join(',')).join(' '),fill:s.color,stroke:'#fff','stroke-width':'4', 'stroke-linejoin':'round'},icon);b.appendChild(icon);const label=document.createElement('span');if(s.id==='thintri')label.innerHTML='ほそ<wbr>さんかく';else label.textContent=s.name;b.appendChild(label);const count=document.createElement('span');count.className='count';count.textContent=s.max;b.appendChild(count);b.addEventListener('click',()=>{
+ const mobile=isMobileView()&&sheetOpen==='pieces';
+ const amount=mobile?mobilePieceBatchCount:1;
+ const count=addPiece(s.id,amount);
+ if(mobile){
+  const feedback=$('mobilePieceFeedback');
+  if(feedback)feedback.textContent=count?`${s.name}を${count}枚追加したよ！${count<amount?'（置ける枚数まで）':''}`:'追加できなかったよ。空きや所持上限を確認してね。';
+  if(count&&!mobilePieceContinuous)closeMobileSheet();
+ }
+});palette.appendChild(b)}}
 // 新しく取り出したピースは、できるだけほかのピースと重ならない場所へ。
 function findSpawn(type,preferX,preferY){
  const probe={id:-1,type,x:preferX,y:preferY,rot:0};
@@ -1665,16 +1695,31 @@ function findSpawn(type,preferX,preferY){
  }
  return null;
 }
-function addPiece(type){if(colorShareSession){toast('ぬりえ交換では色だけ塗れるよ');return;}
-
- if(pieces.filter(p=>p.type===type).length>=SHAPE[type].max){toast('このかたちのピースは全部つかったよ');return}
- const spread=(pieces.length*31)%180;
- const origin=usesViewportCamera()?{x:camera.cx,y:camera.cy}:mode==='puzzle'?{x:170,y:508}:{x:350-90+spread,y:310+((pieces.length%5)-2)*38};
- const pos=findSpawn(type,origin.x,origin.y);
- if(!pos){toast('置くスペースが足りないよ。盤面を広げてみてね');return;}
- history();
- const p={id:nextId++,type,x:pos.x,y:pos.y,rot:0};
- pieces.push(p);selected=p.id;if(isMobileView())focusOnPieceIfHidden(p);renderAll();save();blip();toast(`${SHAPE[type].name}を だしたよ！`);
+function addPiece(type,count=1){
+ if(colorShareSession){toast('ぬりえ交換では色だけ塗れるよ');return 0;}
+ if(!SHAPE[type])return 0;
+ const wanted=Math.max(1,Math.min(5,Math.floor(Number(count)||1)));
+ const available=SHAPE[type].max-pieces.filter(p=>p.type===type).length;
+ if(available<=0){toast('このかたちのピースは全部つかったよ');return 0;}
+ const limit=Math.min(wanted,available);
+ let added=0,last=null;
+ for(let i=0;i<limit;i++){
+  const spread=(pieces.length*31)%180;
+  const origin=usesViewportCamera()?{x:camera.cx,y:camera.cy}:mode==='puzzle'?{x:170,y:508}:{x:350-90+spread,y:310+((pieces.length%5)-2)*38};
+  const pos=findSpawn(type,origin.x,origin.y);
+  if(!pos)break;
+  // One batch is a single undo step, even when only some of the requested pieces fit.
+  if(!added)history();
+  const p={id:nextId++,type,x:pos.x,y:pos.y,rot:0};
+  pieces.push(p);last=p;added++;
+ }
+ if(!added){toast('置くスペースが足りないよ。盤面を広げてみてね');return 0;}
+ selected=last.id;
+ if(isMobileView())focusOnPieceIfHidden(last);
+ renderAll();save();blip();
+ const suffix=added<wanted?'（置ける分だけ）':'';
+ toast(added===1?`${SHAPE[type].name}を だしたよ！${suffix}`:`${SHAPE[type].name}を ${added}枚だしたよ！${suffix}`);
+ return added;
 }
 
 function pt(ev){const pos=svg.createSVGPoint();pos.x=ev.clientX;pos.y=ev.clientY;const m=svg.getScreenCTM();return m?pos.matrixTransform(m.inverse()):{x:350,y:310}}
@@ -2467,7 +2512,7 @@ async function exchangeReadFile(file){
 const TITLE_FORMAT='pitatorie-title-play',TITLE_STORE='pitatorie_title_exchange_v1',TITLE_DRAFT_STORE='pitatorie_title_draft_v1';
 const TITLE_LIMIT=30;
 // Separate the title-game prompt catalog from the general idea cards and the relay game.
-// v9.61: Independent relay-only prompts. Every entry names a visible object or scene.
+// v9.62: Independent relay-only prompts. Every entry names a visible object or scene.
 // Do not change the file protocol or saved session schema when updating this catalog.
 const RELAY_PROMPT_GROUPS={"いきものと変身":["しっぽがプロペラのネコ","長いマントのペンギン","背中に家をのせたカメ","三つの耳があるウサギ","羽が花びらのチョウ","おなかが時計のクジラ","二本足で歩くタコ","王冠より大きなカエル","くつをはいたキリン","小さな翼のゾウ","つのが木の枝のシカ","帽子を運ぶアリの行列","おしりが風船のイヌ","長い首で月をつつく鳥","背中に山があるハリネズミ","ひれが傘のサメ","二つのしっぽのキツネ","足が車輪のワニ","花束を持つゴリラ","丸いからだのドラゴン","三角の甲羅のカメ","小さな船を引くイルカ","ちょうちょの羽をつけたクマ","しっぽで釣りをするネズミ","大きなリボンのコウモリ"],"食べものの事件":["ころがる巨大プリン","車輪のあるホットケーキ","お城になった食パン","三角屋根のハンバーガー","長いしっぽのソーセージ","帽子みたいなオムレツ","空を飛ぶおにぎり","とがった山のアイスクリーム","ロケットになったにんじん","花が咲いたドーナツ","船に乗ったたいやき","足のある大きなゼリー","リボンだらけのケーキ","三つ重ねのたこやき","ピアノの形のチョコレート","長ぐつに入ったポップコーン","風車みたいなピザ","階段になったクッキー","王冠みたいなメロン","大きな傘のブロッコリー","月の形のバナナ","星のついたお弁当箱","くるまになったかぼちゃ","虹の橋を渡るおだんご","かばんに入ったスイカ"],"へんてこ道具":["はしごになったえんぴつ","翼のあるめがね","三つの針の大時計","靴の形の電話","月をつかむトング","屋根のあるじょうろ","車輪で走るピアノ","大きな鍵のついたかばん","はねが二枚のほうき","星型の虫めがね","逆さまのティーポット","花びらのついたはさみ","小さな船の形のベッド","塔みたいな本棚","プロペラつきのランドセル","二つの口があるラッパ","とんがり帽子のランプ","三角の鏡があるドレッサー","足の長い目覚まし時計","橋になったものさし","階段のついた宝箱","羽の形のスプーン","大きな車輪の糸車","木の枝みたいなハンガー","折りたためる小さな門"],"まちの異変":["屋根が船になった学校","ひとつ目の窓がある塔","階段だらけのパン屋","雲の上に立つ駅","木の上の郵便ポスト","三つの煙突があるお城","まんなかが空いた橋","時計が三つの町役場","スプーン型の街灯","大きな帽子の形の家","回る屋根の風車小屋","海に浮かぶ小さな図書館","きのこの形のホテル","ふたごの灯台","月の形の噴水","長い足のある家","逆さまになった観覧車","大きな窓がある山小屋","屋根に花が咲いたお店","星型の屋根の天文台","らせん階段の小さな塔","リボンでつながる二つの家","丸い扉の洞窟のおうち","三角屋根の空中庭園","翼のついたお城"],"のりもの大ぼうけん":["羽のついた路面電車","三輪の宇宙ロケット","魚の形の飛行機","大きな帆のある自転車","三つの煙突の蒸気船","そりになったバス","星を運ぶ貨物列車","タイヤの大きな消防車","二階建ての潜水艦","月へ向かう小さな気球","プロペラが四つのボート","尻尾のあるヘリコプター","ピラミッド型の宇宙船","波の上を走る機関車","二本マストの海賊船","傘が屋根のオープンカー","三角の車輪のトラック","空を走る観光バス","船の形のスケートボード","雲を押して進む飛行船","背の高い一輪車","長い鼻のある潜水艇","丸い窓の宇宙ステーション","ロボットが引く馬車","二つの船体があるヨット"],"ものがたりの一場面":["竜の背中に立つ灯台","巨人のくつに住む小人","月に届きそうなはしご","橋の真ん中の宝箱","森に落ちた大きな王冠","ひとりで歩く小さなお城","雪だるまが守る門","雲からぶら下がる時計","ふねを引っ張る大きな鳥","砂漠にささった巨大な鍵","かぼちゃ馬車のこわれた車輪","海底にねむる古いピアノ","崖の先にある赤い家","大きな卵を運ぶロボット","空にひらいた三角の扉","木にひっかかった飛行船","流れ星が落ちた井戸","二つの塔をつなぐ虹","山頂に立つふしぎな傘","小さな舟と大きなクジラ","お城をかこむ巨大な花","階段の先で待つ月","沈んだ船の上の宝箱","ドラゴンが抱える星","時計の中にある小さな町"]};
 const RELAY_PROMPT_CATEGORIES=['すべて',...Object.keys(RELAY_PROMPT_GROUPS)];
@@ -3581,6 +3626,10 @@ function openMobileSheet(kind){
  for(const button of document.querySelectorAll('[data-proxy]')){
   button.disabled=$(button.dataset.proxy).disabled||($(button.dataset.proxy).classList.contains('hide'));
  }
+ if(kind==='pieces'){
+  syncMobilePieceOptions();
+  const feedback=$('mobilePieceFeedback');if(feedback)feedback.textContent='好きな形をタップして取り出そう！';
+ }
  const closeBtn=$(kind==='pieces'?'mobilePaletteSheet':'mobileToolsSheet').querySelector('.close-sheet');closeBtn?.focus({preventScroll:true});
 }
 function closeMobileSheet(){
@@ -3593,6 +3642,10 @@ function syncMobileButtons(){
 }
 $('mobileMenuLaunch').addEventListener('click',()=>openMobileSheet('tools'));
 $('mobileOpenPieces').addEventListener('click',()=>openMobileSheet('pieces'));
+for(const b of document.querySelectorAll('[data-piece-batch]'))b.addEventListener('click',()=>{
+ mobilePieceBatchCount=Number(b.dataset.pieceBatch);syncMobilePieceOptions();
+});
+$('mobilePieceContinuous').addEventListener('change',e=>{mobilePieceContinuous=e.target.checked});
 $('mobileSheetBackdrop').addEventListener('click',closeMobileSheet);
 for(const btn of document.querySelectorAll('.close-sheet'))btn.addEventListener('click',closeMobileSheet);
 $('mobileRotateLeft').addEventListener('click',()=>$('rotateLeft').click());
