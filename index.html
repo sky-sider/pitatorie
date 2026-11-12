@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#ffefd5">
-<title>ピタトリエ v9.46 — つくる・ぬる・ひらめく</title>
+<title>ピタトリエ v9.51 — つくる・ぬる・ひらめく</title>
 <style>
 :root{font-family:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;color:#33465b;--ink:#34465b;--soft:#6e7e8e;--peach:#ff8d86;--mint:#7fd3c3;--cream:#fff8ed;--shadow:0 7px 0 #dfd9d0,0 10px 28px #8c85801b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{background:#f8f1e7}body{margin:0;background:radial-gradient(circle at 17% 2%,#ffeadb 0,transparent 31%),radial-gradient(circle at 98% 20%,#e3f7f0 0,transparent 42%),linear-gradient(180deg,#fff9ef,#f9f0e6);min-height:100dvh;overscroll-behavior-y:contain}
@@ -712,7 +712,7 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 .howto-menu-entry{width:100%;min-height:56px;display:flex;align-items:center;gap:10px;padding:8px 12px;border:2px solid #edb6a0;border-radius:15px;background:linear-gradient(115deg,#fff8e4,#ffebdc);color:#79452f;text-align:left;box-shadow:0 3px 0 #d9ab8c}
 .howto-menu-entry strong{display:block;font-size:15px;line-height:1.3}.howto-menu-entry small{display:block;font-size:12px;color:#a47859;font-weight:800;line-height:1.3}.howto-menu-entry .howto-menu-icon{width:32px;height:32px;flex:none;font-size:21px;background:#fff5df}.howto-menu-chevron{margin-left:auto;font-size:27px;color:#bf9369}
 .howto-content{display:flex;flex-direction:column;gap:12px}
-.howto-tabs{position:sticky;top:-12px;z-index:5;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:#fffaf2;padding:4px 0 8px;border-bottom:1px solid #edd8b8}
+.howto-tabs{position:sticky;top:-12px;z-index:5;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;background:#fffaf2;padding:4px 0 8px;border-bottom:1px solid #edd8b8}
 .howto-tabs button{min-width:0;min-height:45px;border:2px solid #e5cfb4;background:#fffefa;border-radius:12px;color:#956744;font-size:13px;font-weight:1000;padding:5px 2px}
 .howto-tabs button[aria-selected="true"]{border-color:#96c482;background:#dff3d3;color:#3a7947}
 .howto-lead{font-size:14px;font-weight:800;color:#8c644a;line-height:1.55;margin:0}
@@ -753,6 +753,41 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 .howto-exchange-flow span{display:grid;place-items:center;gap:3px;text-align:center;color:#815237;font-size:11px;font-weight:900;line-height:1.3}
 .howto-exchange-flow .uiicon{width:29px;height:29px;min-width:29px;margin:0}
 .howto-exchange-flow b{font-size:17px;color:#c38a5b}
+.howto-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.howto-category{min-width:0;padding:10px 10px 11px;border:2px solid #e8d1af;border-radius:16px;background:#fffefb;box-shadow:0 3px 0 #e3c8a8;display:flex;flex-direction:column;gap:8px}
+.howto-category h3{margin:0;font-size:15px;line-height:1.3;color:#754530;font-weight:1000;display:flex;align-items:center;gap:6px}
+.howto-category h3 .uiicon{width:26px;height:26px;min-width:26px;margin:0}
+.howto-category p{margin:0;font-size:12px;line-height:1.55;color:#8d7056}
+.howto-chip-list{display:flex;flex-wrap:wrap;gap:6px}
+.howto-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 8px;border-radius:999px;border:1px solid #e7d0b4;background:#fff8ea;color:#7f543a;font-size:11px;font-weight:900;line-height:1.2}
+.howto-chip .uiicon{width:18px;height:18px;min-width:18px;margin:0}
+.howto-flow-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.howto-flow-card{min-width:0;padding:10px;border:2px solid #ead3b3;border-radius:16px;background:#fffefb;box-shadow:0 3px 0 #e3c8a8;display:flex;flex-direction:column;gap:8px}
+.howto-flow-card h3{margin:0;font-size:15px;line-height:1.35;color:#754530;font-weight:1000;display:flex;align-items:center;gap:7px}
+.howto-flow-card h3 .uiicon{width:27px;height:27px;min-width:27px;margin:0}
+.howto-flow-card p{margin:0;font-size:12px;line-height:1.55;color:#8d7056}
+/* A flow's immediate steps are cards; nested .uiicon spans must NOT inherit card styling. */
+.howto-mini-flow{display:flex;align-items:stretch;gap:4px;flex-wrap:nowrap;padding:8px 6px;border:1px solid #e7d1b8;border-radius:12px;background:#fff7e9}
+.howto-mini-flow > span{display:flex;flex:1 1 0;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:8px 3px;border-radius:10px;border:1px solid #ead6b7;background:#fffdf7;color:#815237}
+.howto-mini-flow > span > .uiicon{width:28px;height:28px;min-width:28px;margin:0;flex:none}
+.howto-mini-flow > span > em{font-style:normal;font-size:11px;line-height:1.35;font-weight:900;overflow-wrap:anywhere}
+.howto-mini-flow > b{font-size:16px;color:#c38a5b;line-height:1;flex:none;align-self:center}
+.howto-button-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.howto-button-grid .howto-main-action{width:100%}
+.howto-subtle{font-size:11px;line-height:1.55;color:#9a7a62;margin:0}
+
+/* Keep the category overview and illustrated instructions legible on phones. */
+@media(max-width:800px){
+  .howto-category-grid,.howto-flow-grid{grid-template-columns:1fr}
+  .howto-category{gap:7px;padding:12px}
+  .howto-category h3{font-size:16px}
+  .howto-category p{font-size:13px;line-height:1.6}
+  .howto-flow-card{padding:12px;gap:10px}
+  .howto-mini-flow{flex-direction:column;align-items:stretch;gap:4px;padding:9px}
+  .howto-mini-flow > span{flex:0 0 auto;min-height:45px;flex-direction:row;justify-content:flex-start;text-align:left;padding:7px 12px;gap:10px}
+  .howto-mini-flow > span > em{font-size:12px;line-height:1.35;overflow-wrap:normal}
+  .howto-mini-flow > b{align-self:center;transform:rotate(90deg);font-size:15px;line-height:0.85}
+}
 @media(max-width:800px),(max-width:900px) and (orientation:landscape) and (max-height:500px){
   .howto-header{min-height:44px;width:44px;height:44px;padding:0;box-shadow:0 2px 0 #d0a26b;border-radius:12px}
   .howto-header>span:first-child{width:27px;height:27px}
@@ -876,8 +911,12 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 .title-play .title-mode-picks small{display:block;font-size:11px;font-weight:500;margin-top:3px}
 .title-play .title-actions{display:flex;gap:8px;flex-wrap:wrap}
 .title-play .title-actions button{min-height:43px;flex:1;min-width:130px}
-.title-play .title-art-preview{width:100%;max-width:470px;aspect-ratio:1.35;overflow:hidden;display:flex;align-items:center;justify-content:center;border:2px solid #ead9c8;background:#fffbf3;border-radius:13px;margin:auto}
+.title-play .title-art-preview{width:100%;max-width:470px;aspect-ratio:1;overflow:hidden;display:flex;align-items:center;justify-content:center;border:0;background:transparent;border-radius:13px;margin:auto;position:relative}
 .title-play .title-art-preview svg{width:100%;height:100%;display:block;object-fit:contain}
+.title-play .title-framed-art{padding:0}
+.title-play .title-framed-art .title-frame-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;z-index:2}
+.title-play .title-framed-art .title-art-inner{position:absolute;left:20.8%;top:22.3%;width:56%;height:52.3%;display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:1}
+.title-play .title-framed-art .title-art-inner svg{width:100%;height:100%;display:block}
 .title-play .title-empty{padding:18px;text-align:center;color:#866757;background:#fff7ed;border-radius:12px;font-size:13px;line-height:1.7}
 .title-play .title-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
 .title-play .title-pair>div{background:#fff1e6;border-radius:12px;padding:12px;min-width:0;overflow-wrap:anywhere}
@@ -887,8 +926,10 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
 .title-play .title-list-item{background:white;border:1.5px solid #e8d1b7;padding:12px;border-radius:12px;display:grid;gap:7px}
 .title-play .title-list-item strong{font-size:14px;overflow-wrap:anywhere}
 .title-play .title-list-item .title-actions button{min-width:95px}
-@media(max-width:420px){.title-play .title-mode-picks{grid-template-columns:1fr}.title-play .title-pair{grid-template-columns:1fr}.title-play .title-card{padding:10px}.title-play .title-art-preview{aspect-ratio:1.05}}
+@media(max-width:420px){.title-play .title-mode-picks{grid-template-columns:1fr}.title-play .title-pair{grid-template-columns:1fr}.title-play .title-card{padding:10px}.title-play .title-art-preview{max-width:400px}}
 
+/* v9.51: relay art uses the same ornamental gallery frame as title-play. */
+.relay-play .relay-framed-art{margin:4px auto 8px;max-width:470px;aspect-ratio:1}
 /* v9.42 relay gallery and responsive art workspace. */
 .relay-play .relay-word-art{border:2px dashed #dec39b;background:#fff2de;border-radius:17px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding:23px 13px;min-height:112px;overflow-wrap:anywhere}
 .relay-play .relay-word-art small,.relay-play .relay-current small{display:block;font-size:12px;font-weight:800;color:#936b52}
@@ -2455,7 +2496,13 @@ function titleSource(){
  if(found)return {theme:found.theme,boardSize:found.boardSize,pieces:found.pieces};
  return {theme:chosenTheme,boardSize:freeBoardSize,pieces:mode==='free'?pieces:freePieces};
 }
-function titlePreview(raw){return '<div class="title-art-preview">'+artSvg({name:'タイトルを待つ作品',theme:raw.theme,boardSize:raw.boardSize,pieces:raw.pieces})+'</div>'}
+// The same exhibition frame is shared by "これなーんだ？" and the relay game.
+// The work is drawn beneath the frame, without changing the shared artwork data.
+function framedArtworkPreview(raw,kind='title'){
+ return '<div class="title-art-preview title-framed-art '+(kind==='relay'?'relay-framed-art':'')+'"><div class="title-art-inner">'+artSvg({name:'ブロック作品',theme:raw.theme,boardSize:raw.boardSize,pieces:raw.pieces})+'</div><img class="title-frame-bg" src="'+GALLERY_FRAME+'" alt="" draggable="false"></div>';
+}
+function titlePreview(raw){return framedArtworkPreview(raw)}
+function relayPreview(raw){return framedArtworkPreview(raw,'relay')}
 function titleDownload(data,kind){
  const clean=titleValidate(data);const blob=new Blob([JSON.stringify(clean,null,2)],{type:'application/json;charset=utf-8'});
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pitatorie_title_'+kind+'_'+clean.id+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
@@ -2787,7 +2834,7 @@ function relayGalleryView(album){
  let html='<div class="title-card relay-gallery"><h3>みんなの想像のアルバム</h3><p>最初のお題から、どう変わっていったのかな？</p>'+
  '<div class="relay-counter">'+(i+1)+' / '+album.total+' ターン　・　'+esc(step.by||'おなまえなし')+'</div>';
  if(step.kind==='word')html+='<div class="relay-word-art"><small>'+(i===0?'はじめのお題':'作品から生まれたタイトル')+'</small><strong>'+esc(step.text)+'</strong></div>';
- else html+=titlePreview(step.art);
+ else html+=relayPreview(step.art);
  html+='<div class="title-actions"><button class="feature-action" id="relayGalleryPrev"'+(i===0?' disabled':'')+'>◀ まえ</button><button class="feature-action" id="relayGalleryNext"'+(i===album.total-1?' disabled':'')+'>つぎ ▶</button></div>'+
  '<details class="relay-details"><summary>すべての伝言をみる</summary><ol>'+album.steps.map((s,j)=>'<li><strong>'+(j+1)+'：'+(s.kind==='word'?'お題・タイトル':'ブロック作品')+'</strong>　'+esc(s.by||'')+(s.kind==='word'?'　'+esc(s.text):'（'+s.art.pieces.length+'ピース）')+'</li>').join('')+'</ol></details></div>';
  return html;
@@ -2799,7 +2846,7 @@ function relayRenderHost(){
   return '<div class="title-card"><div class="title-actions"><button class="feature-action" id="relayBack">← 進行中のゲーム一覧へ</button></div><h3>'+(done?'伝言ゲームが完成したよ！':'伝言ゲームを進めよう')+'</h3>'+
   '<p>進み具合：'+session.steps.length+' / '+session.total+' ターン。'+(done?'全員の想像を公開できます。':'進行役が次の人にファイルを渡し、返事を受け取ってください。')+'</p>'+
   (done?relayGalleryView(relayHostExport(session))+'<div class="title-actions"><button id="relayExportAlbum" class="feature-cta">完成アルバムをみんなに渡す</button></div>':
-   '<div class="relay-current"><small>最後に届いたもの（進行役だけに表示）</small>'+(last.kind==='word'?'<strong>'+esc(last.text)+'</strong>':titlePreview(last.art))+'</div>'+
+   '<div class="relay-current"><small>最後に届いたもの（進行役だけに表示）</small>'+(last.kind==='word'?'<strong>'+esc(last.text)+'</strong>':relayPreview(last.art))+'</div>'+
    '<div class="title-actions"><button id="relayExportTask" class="feature-cta">'+(session.pending?'依頼ファイルをもう一度保存':'次の人への依頼をつくる')+'</button></div>'+
    (session.pending?'<p>第'+session.pending.turn+'ターンの返事を待っています。受け取った返事ファイルを下の「読み込む」から開いてください。</p>':'<p>次の人には直前の'+(last.kind==='word'?'お題だけ':'作品だけ')+'が届きます。</p>'))+'</div>';
  }
@@ -2818,12 +2865,12 @@ function relayRenderInbox(){
   const req=entry.task,artTurn=req.taskKind==='art',working=relayState.work?.id===req.id&&relayState.work?.turn===req.turn;
   return '<div class="title-card"><div class="title-actions"><button id="relayBack" class="feature-action">← 受け取った依頼一覧へ</button></div><h3>第'+req.turn+'ターン：'+(artTurn?'ブロックでつくろう':'タイトルをつけよう')+'</h3>'+
    '<p>前の人から届いた'+(artTurn?'お題':'作品')+'だけを見て、自分の想像をつなげます。</p>'+
-   (artTurn?'<div class="relay-word-art"><small>前の人のお題</small><strong>'+esc(req.prev.text)+'</strong></div>':titlePreview(req.prev.art))+
+   (artTurn?'<div class="relay-word-art"><small>前の人のお題</small><strong>'+esc(req.prev.text)+'</strong></div>':relayPreview(req.prev.art))+
    (entry.reply?'<p>返事は保存済みです。進行役へ送ってください。</p><div class="title-actions"><button id="relayResend" class="feature-cta">返事ファイルをもう一度保存</button></div>':
     '<div class="title-fields">'+(!artTurn?'<label>あなたがつけるタイトル<input id="relayReplyText" maxlength="40" placeholder="何に見える？" value="'+esc(entry.draft?.text||'')+'"></label>':'')+
     '<label>あなたの名前（任意）<input id="relayReplyBy" maxlength="24" placeholder="ニックネーム" value="'+esc(entry.draft?.by||'')+'"></label></div>'+
     (artTurn?'<div class="title-actions"><button id="relayMakeArt" class="feature-action">'+(working?'ブロックづくりに戻る':'ブロックをつくりはじめる')+'</button>'+(working?'<button id="relayCancelArt" class="feature-action">制作をやめる</button>':'')+'</div>'+
-     (working?'<div class="relay-current"><small>いまつくっている作品</small>'+(pieces.length?titlePreview({theme:chosenTheme,boardSize:freeBoardSize,pieces}):'<p>まだピースがありません。おもちゃばこから取り出そう。</p>')+'</div>':'<p>制作中はいつものアトリエを安全に退避します。完成すると元に戻ります。</p>'):
+     (working?'<div class="relay-current"><small>いまつくっている作品</small>'+(pieces.length?relayPreview({theme:chosenTheme,boardSize:freeBoardSize,pieces}):'<p>まだピースがありません。おもちゃばこから取り出そう。</p>')+'</div>':'<p>制作中はいつものアトリエを安全に退避します。完成すると元に戻ります。</p>'):
      '<p>正解を当てることより、あなたにはどう見えたかを自由に書いてね。</p>')+
     '<div class="title-actions"><button id="relayAnswer" class="feature-cta"'+(artTurn&&!working?' disabled':'')+'>返事ファイルをつくる</button></div>')+'</div>';
  }
@@ -2904,45 +2951,66 @@ function renderExchangeFeature(){
 // v9.13: a visual play guide, sharing the existing modal so the artboard is never resized.
 let howtoPage=0;
 function renderHowto(){
- const nav=['はじめる','うごかす','色・作品'];
+ const nav=['ぜんたい','あそびをひろげる','作品であそぶ','いつもの操作'];
  const navigation='<nav class="howto-tabs" role="tablist" aria-label="遊びかたのページ">'+nav.map((name,i)=>'<button type="button" role="tab" id="howto-tab-'+i+'" aria-controls="howto-page" aria-selected="'+(howtoPage===i)+'" data-howto-page="'+i+'">'+name+'</button>').join('')+'</nav>';
  const freeArt='<svg viewBox="0 0 156 94" role="img" aria-label="三角屋根のおうちと色とりどりのピース"><polygon points="35,44 77,10 119,44" fill="#F39BAD" stroke="white" stroke-width="3"/><rect x="45" y="44" width="64" height="43" fill="#F8CD75" stroke="white" stroke-width="3"/><rect x="70" y="60" width="20" height="27" fill="#A9D6AD" stroke="white" stroke-width="2"/><rect x="52" y="51" width="13" height="13" fill="#8DC5E9" stroke="white" stroke-width="2"/></svg>';
  const puzzleArt='<svg viewBox="0 0 156 94" role="img" aria-label="うすいおてほんに三角形のピースを合わせる図"><polygon points="28,68 68,12 111,68" fill="#EFDAC7" stroke="#CAAC99" stroke-dasharray="5 5" stroke-width="3"/><polygon points="31,67 69,16 69,67" fill="#7FCDCA" stroke="white" stroke-width="3"/><polygon points="69,67 69,16 108,67" fill="#F4A7C2" stroke="white" stroke-width="3"/><path d="M117 31l8 8 14-17" fill="none" stroke="#7BB85A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
  const moveArt='<svg viewBox="0 0 150 78" role="img" aria-label="ピースを指で動かして辺を合わせる図"><polygon points="10,18 59,18 59,66 10,66" fill="#95DDB5" stroke="white" stroke-width="3"/><polygon points="89,18 137,18 137,66 89,66" fill="#F8BA73" stroke="white" stroke-width="3"/><path d="M62 42h22m-7-7 7 7-7 7" fill="none" stroke="#BD8968" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
  const panArt='<svg viewBox="0 0 150 78" role="img" aria-label="1本指で盤面移動、2本指でピンチ拡大"><rect x="8" y="11" width="134" height="58" rx="8" fill="#FFF2DB" stroke="#DBC3A7" stroke-width="2"/><g fill="#9AD8D3" stroke="white" stroke-width="2"><rect x="30" y="26" width="26" height="26" rx="2"/><polygon points="83,51 109,19 109,51"/></g><path d="M73 17l-7 0m4-4-4 4 4 4" stroke="#BF8E67" fill="none" stroke-width="2.5"/><circle cx="118" cy="56" r="9" fill="#F3BBAA" stroke="#fff" stroke-width="2"/><circle cx="135" cy="46" r="9" fill="#F3BBAA" stroke="#fff" stroke-width="2"/></svg>';
+ const chips=(items)=>'<div class="howto-chip-list">'+items.map(([icon,label])=>'<span class="howto-chip">'+iconHtml(icon)+label+'</span>').join('')+'</div>';
+ const flow=(items)=>'<div class="howto-mini-flow">'+items.map((s,i)=>'<span>'+iconHtml(s[0])+'<em>'+s[1]+'</em></span>'+(i<items.length-1?'<b>→</b>':'' )).join('')+'</div>';
  let page='';
  if(howtoPage===0){
-  page='<p class="howto-lead">まずは好きなあそびを選ぼう。どちらからでも始められるよ。</p>'+ 
-   '<div class="howto-mode-grid">'+
-   '<section class="howto-mode"><div class="howto-art">'+freeArt+'</div><h3>じゆうにつくる</h3><p>好きな形をつくる。色をぬったり、保存したりできるよ。</p><button type="button" data-howto-go="free">ピースを出して遊ぶ</button></section>'+
-   '<section class="howto-mode"><div class="howto-art">'+puzzleArt+'</div><h3>おてほんパズル</h3><p>うすい形に合わせて並べよう。100問から選べるよ。</p><button type="button" data-howto-go="puzzle">おてほんを選ぶ</button></section></div>'+
+  page='<p class="howto-lead">ピタトリエは、ブロックで形をつくって、色をぬって、作品でもあそべる小さなアトリエです。まずはメニューの3つの分類を見てみよう。</p>'+
+   '<div class="howto-category-grid">'+
+   '<section class="howto-category"><h3>'+iconHtml('star')+'あそびをひろげる</h3><p>ひとりでじっくり遊ぶための機能です。つくる・まねする・ぬる・集めるがここにそろっています。</p>'+chips([["book","作品アルバム"],["bulb","ひらめきカード"],["puzzle","おてほん100問"],["palette","いろぬりアトリエ"]])+'</section>'+
+   '<section class="howto-category"><h3>'+iconHtml('book')+'作品であそぶ</h3><p>できた作品を使って、友だちとやりとりしたり、展示したり、想像をつなげて遊べます。</p>'+chips([["book","ぬりえ交換"],["book","ちいさな企画展"],["star","これなーんだ？"],["puzzle","かたちの伝言ゲーム"]])+'</section>'+
+   '<section class="howto-category"><h3>'+iconHtml('gear')+'いつもの操作</h3><p>見た目の変更や、便利な道具、保存まわりの操作です。迷ったらここを開けば大丈夫。</p>'+chips([["palette","カラーセット"],["scissors","創作ツール"],["search","盤面を見る"],["camera","画像を保存"]])+'</section></div>'+
    '<div class="howto-section-title">'+iconHtml('puzzle')+'はじめの3ステップ</div>'+
-   '<div class="howto-steps"><div class="howto-step"><span class="howto-number">1</span>'+iconHtml('puzzle')+'<strong>ピースを出す</strong><small>「＋ピース」をタップ</small></div><div class="howto-step"><span class="howto-number">2</span>'+iconHtml('search')+'<strong>指で動かす</strong><small>辺を近づけてピタッ</small></div><div class="howto-step"><span class="howto-number">3</span>'+iconHtml('book')+'<strong>作品をのこす</strong><small>アルバムに保存</small></div></div>'+
-   '<div class="howto-tip">'+iconHtml('bulb')+'つくりたい形が思いつかないときは「ひらめきカード」を開いてみよう。</div>';
+   '<div class="howto-steps"><div class="howto-step"><span class="howto-number">1</span>'+iconHtml('puzzle')+'<strong>ピースを出す</strong><small>「＋ピース」から1つずつ</small></div><div class="howto-step"><span class="howto-number">2</span>'+iconHtml('search')+'<strong>指で動かす</strong><small>辺や角を近づけてピタッ</small></div><div class="howto-step"><span class="howto-number">3</span>'+iconHtml('book')+'<strong>作品をのこす</strong><small>色をぬったら保存しよう</small></div></div>'+
+   '<div class="howto-button-grid"><button type="button" class="howto-main-action" data-howto-go="free">じゆうにつくる</button><button type="button" class="howto-main-action" data-howto-go="puzzle">おてほんを選ぶ</button></div>'+
+   '<div class="howto-tip">'+iconHtml('bulb')+'どこから始めてもOKです。作りたいものが決まっていないなら「ひらめきカード」、形をまねして遊びたいなら「おてほん100問」がおすすめです。</div>';
  }else if(howtoPage===1){
-  page='<p class="howto-lead">ピースは指で動かせるよ。気持ちよくくっつく位置を探そう。</p>'+
+  page='<p class="howto-lead">「あそびをひろげる」は、ひとりで作品づくりを楽しむためのコーナーです。作ったあとに何ができるかも、ここで広がっていきます。</p>'+
+   '<div class="howto-mode-grid">'+
+   '<section class="howto-mode"><div class="howto-art">'+freeArt+'</div><h3>じゆうにつくる</h3><p>好きな形をのびのび作れます。思いついたらそのまま作品づくりへ。</p><button type="button" data-howto-go="free">ピースを出して遊ぶ</button></section>'+
+   '<section class="howto-mode"><div class="howto-art">'+puzzleArt+'</div><h3>おてほん100問</h3><p>うすい見本に合わせて並べる遊び。問題は100問あります。</p><button type="button" data-howto-go="puzzle">おてほんを選ぶ</button></section></div>'+
+   '<div class="howto-section-title">'+iconHtml('star')+'できること</div>'+
+   '<div class="howto-tool-list">'+
+   '<div class="howto-tool">'+iconHtml('book')+'<div><strong>作品アルバム</strong><small>作った作品を名前つきで保存。あとで見返したり、お気に入りを集めたりできます。</small></div></div>'+
+   '<div class="howto-tool">'+iconHtml('bulb')+'<div><strong>ひらめきカード</strong><small>何を作るか迷ったときの発想カード。気になるお題を見て、自由に形にしてみよう。</small></div></div>'+
+   '<div class="howto-tool">'+iconHtml('puzzle')+'<div><strong>おてほん100問</strong><small>やさしい形から少しずつ挑戦。完成したら達成感も味わえます。</small></div></div>'+
+   '<div class="howto-tool">'+iconHtml('palette')+'<div><strong>いろぬりアトリエ</strong><small>24色で作品を仕上げます。1ピースずつでも、まとめてでも塗れます。</small></div></div></div>'+
+   '<div class="howto-section-title">'+iconHtml('palette')+'おすすめの流れ</div>'+
+   flow([["bulb","お題を決める"],["puzzle","形をつくる"],["palette","色をぬる"],["book","アルバムに保存"]])+
+   '<div class="howto-button-grid"><button type="button" class="howto-main-action" data-howto-go="ideas">ひらめきカードを見る</button><button type="button" class="howto-main-action" data-howto-go="paint">いろぬりを開く</button><button type="button" class="howto-main-action" data-howto-go="album">作品アルバムを見る</button><button type="button" class="howto-main-action" data-howto-go="puzzle">おてほん100問へ</button></div>'+
+   '<p class="howto-subtle">※ いろぬりアトリエでは、今の盤面の作品をそのまま塗れます。</p>';
+ }else if(howtoPage===2){
+  page='<p class="howto-lead">「作品であそぶ」は、できあがった作品を使って広がる4つの遊びです。流れを見ながら、気になるものから試してみよう。</p>'+
+   '<div class="howto-flow-grid">'+
+   '<section class="howto-flow-card"><h3>'+iconHtml('book')+'ぬりえ交換</h3><p>形だけの作品を友だちに渡して、色をぬって返してもらう遊びです。</p>'+flow([["puzzle","作品をつくる"],["book","ファイルをわたす"],["palette","友だちがぬる"],["book","返してもらう"]])+'<button type="button" class="howto-main-action" data-howto-go="exchange">ぬりえ交換を開く</button></section>'+
+   '<section class="howto-flow-card"><h3>'+iconHtml('book')+'ちいさな企画展</h3><p>自分や友だちの作品を選んで、額縁に入れた展示会を作れます。</p>'+flow([["book","作品をえらぶ"],["star","タイトルをつける"],["book","展示をならべる"],["camera","画像で保存"]])+'<button type="button" class="howto-main-action" data-howto-go="gallery">ちいさな企画展を開く</button></section>'+
+   '<section class="howto-flow-card"><h3>'+iconHtml('star')+'これなーんだ？</h3><p>作品を渡して、相手に「何に見えるか」を自由にタイトルで返してもらう遊びです。</p>'+flow([["puzzle","作品をつくる"],["book","相手にわたす"],["star","相手が名前をつける"],["book","感想を見る"]])+'<button type="button" class="howto-main-action" data-howto-go="title">これなーんだ？を開く</button></section>'+
+   '<section class="howto-flow-card"><h3>'+iconHtml('puzzle')+'かたちの伝言ゲーム</h3><p>「お題 → 作品 → タイトル」を順番につないでいく、連鎖型の遊びです。</p>'+flow([["bulb","お題"],["puzzle","ブロック作品"],["star","タイトル"],["book","次の人へ"],["book","最後にアルバム"]])+'<button type="button" class="howto-main-action" data-howto-go="relay">かたちの伝言ゲームを開く</button></section>'+
+   '</div>'+
+   '<div class="howto-tip">'+iconHtml('bulb')+'「ぬりえ交換」「これなーんだ？」「かたちの伝言ゲーム」は、JSONファイルを相手に渡して遊びます。メッセージアプリや共有機能でファイルを送り合ってください。</div>';
+ }else{
+  page='<p class="howto-lead">「いつもの操作」は、よく使う便利機能のまとめです。作品づくりの途中で困ったときは、ここを思い出してね。</p>'+
    '<div class="howto-gesture-grid">'+
-   '<div class="howto-gesture">'+moveArt+'<strong>ピースを動かす</strong><p>触ってドラッグ。辺に近づけるとピタッと吸着するよ。</p></div>'+
-   '<div class="howto-gesture">'+panArt+'<strong>盤面を見渡す</strong><p>空白をなぞると移動。2本指で拡大・縮小できるよ。</p></div></div>'+
+   '<div class="howto-gesture">'+moveArt+'<strong>ピースを動かす</strong><p>触ってドラッグ。辺や角に近づけるとピタッと吸着します。</p></div>'+
+   '<div class="howto-gesture">'+panArt+'<strong>盤面を見渡す</strong><p>空白をなぞると移動。2本指で拡大・縮小できます。</p></div></div>'+
+   '<div class="howto-section-title">'+iconHtml('gear')+'いつもの操作でできること</div>'+
+   '<div class="howto-tool-list">'+
+   '<div class="howto-tool">'+iconHtml('palette')+'<div><strong>カラーセット</strong><small>ピースの見た目の配色を切り替えます。形や仕組みは変わりません。</small></div></div>'+
+   '<div class="howto-tool">'+iconHtml('scissors')+'<div><strong>創作ツール</strong><small>複製・左右反転・回転コピーで、模様や大作づくりを助けます。</small></div></div>'+
+   '<div class="howto-tool">'+iconHtml('search')+'<div><strong>画面を中央に戻す</strong><small>盤面の真ん中へ戻ります。見失ったときに便利です。</small></div></div>'+
+   '<div class="howto-tool">'+iconHtml('search')+'<div><strong>盤面全体を見る</strong><small>今ある作品が画面内におさまるように、自動で引いて見せます。</small></div></div>'+
+   '<div class="howto-tool">'+iconHtml('broom')+'<div><strong>ぜんぶかたづける</strong><small>盤面のピースをまとめて片づけます。必要なら先に保存しましょう。</small></div></div>'+
+   '<div class="howto-tool">'+iconHtml('camera')+'<div><strong>画像を保存</strong><small>右下にロゴ入りの画像を書き出せます。作品紹介や共有にも使えます。</small></div></div></div>'+
    '<div class="howto-section-title">'+iconHtml('gear')+'盤面の下のボタン</div>'+
    '<div class="howto-dock-demo" role="img" aria-label="消す、もどす、左回転、右回転、ピースの5つのボタン"><span><b>×</b>消す</span><span><b>↩</b>もどす</span><span><b>↶</b>左回転</span><span><b>↷</b>右回転</span><span><b>＋</b>ピース</span></div>'+
-   '<div class="howto-tip">'+iconHtml('bulb')+'「まとめて」でつながったピースを一緒に移動。小さなピースは約0.3秒長押しすると、指で隠さず動かせるよ。回転は1回30度。</div>';
- }else{
-  page='<p class="howto-lead">形ができたら、色をつけたり、作品を集めたりしてみよう。</p>'+
-   '<div class="howto-section-title">'+iconHtml('palette')+'色をぬって仕上げよう</div>'+
-   '<div class="howto-palette-demo" role="img" aria-label="赤、橙、黄、緑、水色、青、紫、ピンクの色見本">'+['#F67878','#FFAD77','#FAD36F','#A3D67C','#72CEBC','#74B9E4','#AC99DE','#EE9BBD'].map(c=>'<i style="background:'+c+'"></i>').join('')+'</div>'+
-   '<div class="howto-tool-list">'+
-   '<div class="howto-tool">'+iconHtml('palette')+'<div><strong>いろぬりアトリエ</strong><small>24色で1枚ずつ、なぞって、まとめて塗れるよ。</small></div></div>'+
-   '<div class="howto-tool">'+iconHtml('book')+'<div><strong>作品アルバム</strong><small>名前をつけて保存。お気に入りや全画面鑑賞もできるよ。</small></div></div>'+
-   '<div class="howto-tool">'+iconHtml('bulb')+'<div><strong>ひらめきカード</strong><small>何を作るか迷ったら100種類のお題から。</small></div></div>'+
-   '<div class="howto-tool">'+iconHtml('scissors')+'<div><strong>創作ツール</strong><small>複製・左右反転・回転コピーで大きな作品も。</small></div></div></div>'+
-   '<div class="howto-section-title">'+iconHtml('book')+'友達とぬりえ交換</div>'+
-   '<div class="howto-exchange-flow"><span>'+iconHtml('puzzle')+'形をわたす</span><b>→</b><span>'+iconHtml('palette')+'友達がぬる</span><b>→</b><span>'+iconHtml('book')+'返してもらう</span></div>'+
-   '<div class="howto-tip">作品1点をJSONファイルで渡すよ。受け取った人は形を動かさず、色だけ塗れるんだ。画像保存は「メニュー → 画像を保存」から。</div>'+
-   '<div class="howto-tool-list"><button type="button" class="howto-main-action" data-howto-go="paint">いろぬりをはじめる</button><button type="button" class="howto-main-action" data-howto-go="album">アルバムを見る</button><button type="button" class="howto-main-action" data-howto-go="exchange">ぬりえ交換を開く</button><button type="button" class="howto-main-action" data-howto-go="ideas">ひらめきカードを見る</button></div>'+
-    '<div class="howto-section-title">'+iconHtml('star')+'友だちと想像をつなごう</div>'+
-    '<div class="howto-tip">タイトルあそびは作品に名前をつけてもらう遊び。かたちの伝言ゲームでは「お題 → 作品 → タイトル」を交互につなぐよ。進行する人がファイルを順番に渡して、最後にアルバムを公開するんだ。</div>'+
-    '<div class="howto-tool-list"><button type="button" class="howto-main-action" data-howto-go="title">タイトルあそびを開く</button><button type="button" class="howto-main-action" data-howto-go="relay">かたちの伝言ゲームを開く</button></div>';
+   '<div class="howto-button-grid"><button type="button" class="howto-main-action" data-howto-go="colors">カラーセットを開く</button><button type="button" class="howto-main-action" data-howto-go="tools">創作ツールを開く</button></div>'+
+   '<div class="howto-tip">'+iconHtml('bulb')+'「まとめて」を使うと、つながったピースを一緒に移動できます。小さなピースは約0.3秒長押しすると、指で隠さず動かせます。回転は1回30度です。</div>';
  }
  setFeatureHtml(iconHtml('bulb')+'遊びかた', '<div class="howto-content">'+navigation+'<div id="howto-page" role="tabpanel" aria-labelledby="howto-tab-'+howtoPage+'" class="howto-content">'+page+'</div></div>');
  for(const b of $('featureBody').querySelectorAll('[data-howto-page]'))b.onclick=()=>{howtoPage=Number(b.dataset.howtoPage);renderHowto();$('featureBody').scrollTop=0;$('howto-tab-'+howtoPage)?.focus({preventScroll:true})};
@@ -3101,8 +3169,9 @@ function galleryDrawPlaque(ctx,plate,x,y,w,entry){
    lines[1]=shorten(lines[1]||'');
   }
  }
- const center=y+h*.535;
- const spacing=font*1.08;
+ // Keep a little more top and bottom breathing room and place the title slightly lower.
+ const center=y+h*.575;
+ const spacing=font*1.02;
  lines.forEach((line,i)=>ctx.fillText(line,x+w/2,center+(i-(lines.length-1)/2)*spacing,width));
  ctx.restore();
 }
@@ -3130,7 +3199,6 @@ async function galleryRenderCanvas(canvas,show){
   ctx.drawImage(frame,x,top,frameW,frameW);
   galleryDrawPlaque(ctx,plate,x+frameW*.055,top+frameW+16,frameW*.89,ent);
  }
- ctx.font='700 21px "Yu Gothic","Noto Sans CJK JP",sans-serif';ctx.fillStyle='#8a6a54';ctx.textAlign='left';ctx.fillText('ピタトリエの小さな展示室',80,1040);
  // Match the existing exported images: logo in the bottom-right corner.
  drawExportLogo(ctx,canvas.width===GALLERY_W?canvas:{width:GALLERY_W,height:GALLERY_H});
 }
