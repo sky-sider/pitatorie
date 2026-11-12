@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#ffefd5">
-<title>ピタトリエ v9.58 — つくる・ぬる・ひらめく</title>
+<title>ピタトリエ v9.61 — つくる・ぬる・ひらめく</title>
 <style>
 :root{font-family:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;color:#33465b;--ink:#34465b;--soft:#6e7e8e;--peach:#ff8d86;--mint:#7fd3c3;--cream:#fff8ed;--shadow:0 7px 0 #dfd9d0,0 10px 28px #8c85801b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{background:#f8f1e7}body{margin:0;background:radial-gradient(circle at 17% 2%,#ffeadb 0,transparent 31%),radial-gradient(circle at 98% 20%,#e3f7f0 0,transparent 42%),linear-gradient(180deg,#fff9ef,#f9f0e6);min-height:100dvh;overscroll-behavior-y:contain}
@@ -1006,6 +1006,19 @@ body.color-exchange-active #paintExit{background:#dcf2dd;border-color:#a9d5a5;co
  .level-list .level-details em{font-size:15px;line-height:1.35}
  .level-list .level-details small{font-size:12px}
 }
+
+/* v9.60: independent, browseable title-play prompt collection. */
+.title-play .title-prompt-library{border:1.5px solid #ead5b7;background:#fff8e9;border-radius:14px;padding:10px;display:grid;gap:9px;min-width:0}
+.title-play .title-prompt-library-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#7d523b;font-size:13px;font-weight:900}
+.title-play .title-prompt-category{width:100%;min-height:43px;font:inherit;font-weight:800;color:#75503d;background:#fffdf7;border:2px solid #e2c5a4;border-radius:11px;padding:7px 9px;box-sizing:border-box}
+.title-play .title-prompt-library .title-actions button{min-width:0}
+.title-play .title-prompt-library details{padding:7px 8px;border:1px solid #e7d4b8;border-radius:11px;background:#fffdf7}
+.title-play .title-prompt-library summary{cursor:pointer;color:#805337;font-size:13px;font-weight:900;padding:4px 2px}
+.title-play .title-prompt-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:9px}
+.title-play .title-prompt-choices button{min-width:0;min-height:42px;text-align:left;font:inherit;font-size:12px;line-height:1.4;font-weight:800;color:#79523e;padding:8px 9px;border:1.5px solid #ebd7bb;border-radius:10px;background:#fffaf0;cursor:pointer;overflow-wrap:anywhere}
+.title-play .title-prompt-choices button[aria-pressed="true"]{background:#e2f3d7;border-color:#95bf81;color:#46693a}
+.title-play .title-prompt-choices button:focus-visible{outline:3px solid #e59f66;outline-offset:1px}
+@media(max-width:420px){.title-play .title-prompt-choices{grid-template-columns:1fr}.title-play .title-prompt-library{padding:8px}}
 </style>
 </head>
 <body>
@@ -2453,7 +2466,25 @@ async function exchangeReadFile(file){
 // Sessions live in separate storage; the existing board, painting and album formats are untouched.
 const TITLE_FORMAT='pitatorie-title-play',TITLE_STORE='pitatorie_title_exchange_v1',TITLE_DRAFT_STORE='pitatorie_title_draft_v1';
 const TITLE_LIMIT=30;
-const TITLE_PROMPTS=[...new Set(IDEAS.filter(a=>['自由なかたち','いきものと自然','まちとくらし','空想と冒険','ものがたり'].includes(a[0])).map(a=>a[1]))];
+// Separate the title-game prompt catalog from the general idea cards and the relay game.
+// v9.61: Independent relay-only prompts. Every entry names a visible object or scene.
+// Do not change the file protocol or saved session schema when updating this catalog.
+const RELAY_PROMPT_GROUPS={"いきものと変身":["しっぽがプロペラのネコ","長いマントのペンギン","背中に家をのせたカメ","三つの耳があるウサギ","羽が花びらのチョウ","おなかが時計のクジラ","二本足で歩くタコ","王冠より大きなカエル","くつをはいたキリン","小さな翼のゾウ","つのが木の枝のシカ","帽子を運ぶアリの行列","おしりが風船のイヌ","長い首で月をつつく鳥","背中に山があるハリネズミ","ひれが傘のサメ","二つのしっぽのキツネ","足が車輪のワニ","花束を持つゴリラ","丸いからだのドラゴン","三角の甲羅のカメ","小さな船を引くイルカ","ちょうちょの羽をつけたクマ","しっぽで釣りをするネズミ","大きなリボンのコウモリ"],"食べものの事件":["ころがる巨大プリン","車輪のあるホットケーキ","お城になった食パン","三角屋根のハンバーガー","長いしっぽのソーセージ","帽子みたいなオムレツ","空を飛ぶおにぎり","とがった山のアイスクリーム","ロケットになったにんじん","花が咲いたドーナツ","船に乗ったたいやき","足のある大きなゼリー","リボンだらけのケーキ","三つ重ねのたこやき","ピアノの形のチョコレート","長ぐつに入ったポップコーン","風車みたいなピザ","階段になったクッキー","王冠みたいなメロン","大きな傘のブロッコリー","月の形のバナナ","星のついたお弁当箱","くるまになったかぼちゃ","虹の橋を渡るおだんご","かばんに入ったスイカ"],"へんてこ道具":["はしごになったえんぴつ","翼のあるめがね","三つの針の大時計","靴の形の電話","月をつかむトング","屋根のあるじょうろ","車輪で走るピアノ","大きな鍵のついたかばん","はねが二枚のほうき","星型の虫めがね","逆さまのティーポット","花びらのついたはさみ","小さな船の形のベッド","塔みたいな本棚","プロペラつきのランドセル","二つの口があるラッパ","とんがり帽子のランプ","三角の鏡があるドレッサー","足の長い目覚まし時計","橋になったものさし","階段のついた宝箱","羽の形のスプーン","大きな車輪の糸車","木の枝みたいなハンガー","折りたためる小さな門"],"まちの異変":["屋根が船になった学校","ひとつ目の窓がある塔","階段だらけのパン屋","雲の上に立つ駅","木の上の郵便ポスト","三つの煙突があるお城","まんなかが空いた橋","時計が三つの町役場","スプーン型の街灯","大きな帽子の形の家","回る屋根の風車小屋","海に浮かぶ小さな図書館","きのこの形のホテル","ふたごの灯台","月の形の噴水","長い足のある家","逆さまになった観覧車","大きな窓がある山小屋","屋根に花が咲いたお店","星型の屋根の天文台","らせん階段の小さな塔","リボンでつながる二つの家","丸い扉の洞窟のおうち","三角屋根の空中庭園","翼のついたお城"],"のりもの大ぼうけん":["羽のついた路面電車","三輪の宇宙ロケット","魚の形の飛行機","大きな帆のある自転車","三つの煙突の蒸気船","そりになったバス","星を運ぶ貨物列車","タイヤの大きな消防車","二階建ての潜水艦","月へ向かう小さな気球","プロペラが四つのボート","尻尾のあるヘリコプター","ピラミッド型の宇宙船","波の上を走る機関車","二本マストの海賊船","傘が屋根のオープンカー","三角の車輪のトラック","空を走る観光バス","船の形のスケートボード","雲を押して進む飛行船","背の高い一輪車","長い鼻のある潜水艇","丸い窓の宇宙ステーション","ロボットが引く馬車","二つの船体があるヨット"],"ものがたりの一場面":["竜の背中に立つ灯台","巨人のくつに住む小人","月に届きそうなはしご","橋の真ん中の宝箱","森に落ちた大きな王冠","ひとりで歩く小さなお城","雪だるまが守る門","雲からぶら下がる時計","ふねを引っ張る大きな鳥","砂漠にささった巨大な鍵","かぼちゃ馬車のこわれた車輪","海底にねむる古いピアノ","崖の先にある赤い家","大きな卵を運ぶロボット","空にひらいた三角の扉","木にひっかかった飛行船","流れ星が落ちた井戸","二つの塔をつなぐ虹","山頂に立つふしぎな傘","小さな舟と大きなクジラ","お城をかこむ巨大な花","階段の先で待つ月","沈んだ船の上の宝箱","ドラゴンが抱える星","時計の中にある小さな町"]};
+const RELAY_PROMPT_CATEGORIES=['すべて',...Object.keys(RELAY_PROMPT_GROUPS)];
+const RELAY_PROMPTS=Object.values(RELAY_PROMPT_GROUPS).flat();
+let relayPromptCategory='すべて';
+function relayPromptsInCategory(){return relayPromptCategory==='すべて'?RELAY_PROMPTS:(RELAY_PROMPT_GROUPS[relayPromptCategory]||RELAY_PROMPTS)}
+function relayPromptOptionsHtml(){const chosen=$('relayPrompt')?.value||relayHostDraft.prompt;return relayPromptsInCategory().map(p=>'<button type="button" data-relay-prompt-pick="'+esc(p)+'" aria-pressed="'+(chosen===p)+'">'+esc(p)+'</button>').join('')}
+function relaySyncPromptPicks(){const chosen=$('relayPrompt')?.value||'';for(const b of $('featureBody').querySelectorAll('[data-relay-prompt-pick]'))b.setAttribute('aria-pressed',String(b.dataset.relayPromptPick===chosen))}
+function relayChoosePrompt(text){const el=$('relayPrompt');if(!el)return;relayHostDraft.prompt=String(text||'').slice(0,40);el.value=relayHostDraft.prompt;relaySyncPromptPicks()}
+function relayRefreshPromptChoices(){const list=$('relayPromptChoices');if(list)list.innerHTML=relayPromptOptionsHtml();const summary=$('relayPromptChoicesSummary');if(summary)summary.textContent='一覧から選ぶ（'+relayPromptsInCategory().length+'題）'}
+const TITLE_PROMPT_GROUPS={"いきもののふしぎ":["ねぼすけドラゴン","かさをさすペンギン","長ぐつをはいたネコ","お月見するウサギ","空を泳ぐクジラ","しっぽが花のキツネ","リュックを背負ったカメ","帽子の大きなフクロウ","星を運ぶアリ","マフラーを巻いたヘビ","ダンスをするタコ","羽の生えた金魚","ふたごのハリネズミ","たこあげするカエル","スケートするシロクマ","王冠をかぶったカニ","大きな耳のコウモリ","お菓子を守るライオン","お城に住むリス","逆立ちするゾウ"],"へんてこ食べもの":["ロケットみたいなパン","三段重ねのプリン","足の生えたドーナツ","虹色のかき氷","お城みたいなケーキ","月の形のクッキー","羽のあるたい焼き","おばけのホットケーキ","花束みたいなアイス","海に浮かぶスイカ","帽子をかぶったリンゴ","観覧車のお弁当","星形のピザ","リボンつきのおにぎり","大きな鍵のチョコ","雲の形のわたあめ","三角屋根のキャンディ屋","ふねの形のオムライス","お月さまのサンドイッチ","山のようなポップコーン"],"ふしぎな道具":["空飛ぶじょうろ","星をすくうスプーン","月を見る望遠鏡","虹をしまうかばん","魚の形の時計","鍵が三つある宝箱","花びらのついたランプ","タイヤのある本棚","魔法使いのほうき","羽のついた鉛筆","海賊のコンパス","ふたつ口のティーポット","雲をつかまえる網","雪だるまの目覚まし時計","虹色の傘","小さな家の貯金箱","船みたいな靴","ぐるぐる回る風車","星を映す手鏡","三日月のブランコ"],"へんてこなまち":["逆さまのお城","海の上の郵便局","木の上の小さな家","足のある灯台","空飛ぶ時計台","ドーナツ型の広場","雲の上の駅","屋根が三つのパン屋","花のかたちの公園","クジラの形の図書館","橋の上の小さな店","列車になったおうち","海底のガラスのドーム","風車だらけの村","お菓子でできた塔","星の見えるお風呂屋","山のてっぺんのホテル","動く観覧車の家","虹のアーチの門","雪だるまの銅像"],"そらとうみのぼうけん":["雲の上の帆船","星を探すロケット","沈没した海賊船","魚の群れと潜水艦","月へ向かう気球","宝島の灯台","波に乗るドラゴン","羽のある飛行船","宇宙を走る電車","海底の宝箱","空を飛ぶじてんしゃ","三つの帆のヨット","流れ星を追う船","氷山の横のペンギン","サメの形の潜水艦","海に浮かぶお城","星の橋を渡る列車","砂漠を走る帆船","虹の向こうの飛行機","雲を押す大きな風船"],"ものがたりの一場面":["眠る巨人のくつ","ドラゴンの卵を見つけた日","森の中の秘密の扉","宝箱を守る小さなネコ","橋の向こうの古い塔","月夜のかぼちゃ馬車","王さまの忘れた王冠","ひとりぼっちのロボット","雪の中に立つ赤い家","お城へ続く長い階段","魔法の木に実った星","海岸に流れ着いた手紙","倒れた大きな時計","森の入り口の道しるべ","魔女のなくした帽子","砂漠にある小さなオアシス","おばけたちのピクニック","空から降ってきた鍵","雲を食べる大きな鳥","朝焼けの竜と小さな塔"]};
+const TITLE_PROMPT_CATEGORIES=['すべて',...Object.keys(TITLE_PROMPT_GROUPS)];
+const TITLE_PROMPTS=Object.values(TITLE_PROMPT_GROUPS).flat();
+let titlePromptCategory='すべて';
+function titlePromptsInCategory(){return titlePromptCategory==='すべて'?TITLE_PROMPTS:TITLE_PROMPT_GROUPS[titlePromptCategory]||TITLE_PROMPTS}
+function titleSetPrompt(prompt){titleDraft.prompt=String(prompt).slice(0,40);titleSaveDraft();const input=$('titlePrompt');if(input)input.value=titleDraft.prompt;for(const b of $('featureBody').querySelectorAll('[data-title-prompt-pick]'))b.setAttribute('aria-pressed',String(b.dataset.titlePromptPick===titleDraft.prompt))}
+
 let titleState={outbox:[],inbox:[]},titleDraft={mode:'prompt',source:'current',prompt:'',maker:'',authorTitle:'',working:false},titlePage='make',titleOpenedId=null,titleOpenedKind=null;
 try{const x=JSON.parse(localStorage.getItem(TITLE_STORE)||'null');if(x&&Array.isArray(x.outbox)&&Array.isArray(x.inbox)){titleState={outbox:x.outbox.slice(-TITLE_LIMIT),inbox:x.inbox.slice(-TITLE_LIMIT)}}}catch(_){}
 try{const x=JSON.parse(localStorage.getItem(TITLE_DRAFT_STORE)||'null');if(x&&typeof x==='object')titleDraft={mode:x.mode==='free'?'free':'prompt',source:String(x.source||'current'),prompt:String(x.prompt||'').slice(0,40),maker:String(x.maker||'').slice(0,24),authorTitle:String(x.authorTitle||'').slice(0,40),working:x.working===true}}catch(_){}
@@ -2611,7 +2642,12 @@ function renderTitleFeature(){
   html+='<div class="title-card"><h3>① どんなふうに作る？</h3><div class="title-mode-picks">'+
   '<button data-title-mode="free" aria-pressed="'+(titleDraft.mode==='free')+'">じゆうに つくる<small>お題なし。どんな形でもOK！</small></button>'+
   '<button data-title-mode="prompt" aria-pressed="'+(titleDraft.mode==='prompt')+'">おだいから つくる<small>お題をヒントに想像しよう！</small></button></div>'+
-  (titleDraft.mode==='prompt'?'<div class="title-fields"><label>作者だけが知っているお題<input id="titlePrompt" maxlength="40" placeholder="例：空飛ぶクジラ" value="'+esc(titleDraft.prompt)+'"></label></div><div class="title-actions"><button id="titleRandom" class="feature-action">ほかのお題をえらぶ</button></div><p>お題は友だちに送る作品ファイルには入りません。</p>':'<p>お題は不要です。作品を見た友だちの想像にまかせましょう。</p>')+'</div>'+
+  (titleDraft.mode==='prompt'?'<div class="title-fields"><label>作者だけが知っているお題<input id="titlePrompt" maxlength="40" placeholder="例：空を泳ぐクジラ" value="'+esc(titleDraft.prompt)+'"></label></div>'+
+  '<div class="title-prompt-library"><div class="title-prompt-library-head"><span>お題コレクション（全'+TITLE_PROMPTS.length+'題）</span><span>6ジャンル</span></div>'+
+  '<label class="title-fields">ジャンル<select id="titlePromptCategory" class="title-prompt-category">'+TITLE_PROMPT_CATEGORIES.map(c=>'<option value="'+esc(c)+'"'+(c===titlePromptCategory?' selected':'')+'>'+esc(c)+(c==='すべて'?'（120題）':'（20題）')+'</option>').join('')+'</select></label>'+
+  '<div class="title-actions"><button type="button" id="titleRandom" class="feature-action">このジャンルからランダムに選ぶ</button></div>'+
+  '<details><summary>一覧から好きなお題を選ぶ（'+titlePromptsInCategory().length+'題）</summary><div class="title-prompt-choices">'+titlePromptsInCategory().map(p=>'<button type="button" data-title-prompt-pick="'+esc(p)+'" aria-pressed="'+(titleDraft.prompt===p)+'">'+esc(p)+'</button>').join('')+'</div></details>'+
+  '</div><p>自分で考えたお題を直接入力してもOK！ お題は友だちに送る作品ファイルには入りません。</p>':'<p>お題は不要です。作品を見た友だちの想像にまかせましょう。</p>')+'</div>'+
   '<div class="title-card"><h3>② ブロック作品を用意する</h3><div class="title-actions"><button class="feature-action" id="titleGoCanvas">アトリエで作品をつくる</button></div>'+
   '<div class="title-fields"><label>友だちに渡す作品<select id="titleSource">'+sourceOptions.map(([id,label])=>'<option value="'+esc(id)+'"'+(titleDraft.source===id?' selected':'')+'>'+esc(label)+'</option>').join('')+'</select></label></div>'+
   (selected.pieces?.length?titlePreview(selected):'<div class="title-empty">まだピースがありません。アトリエで自由に作ってね。</div>')+'</div>'+
@@ -2634,7 +2670,9 @@ function renderTitleFeature(){
  for(const b of $('featureBody').querySelectorAll('[data-title-delete-outbox]'))b.onclick=()=>titleDelete('outbox',b.dataset.titleDeleteOutbox);
  for(const b of $('featureBody').querySelectorAll('[data-title-delete-inbox]'))b.onclick=()=>titleDelete('inbox',b.dataset.titleDeleteInbox);
  if($('titleCloseOpen'))$('titleCloseOpen').onclick=()=>{titleOpenedId=null;titleOpenedKind=null;renderFeature()};
- if($('titleRandom'))$('titleRandom').onclick=()=>{const old=titleDraft.prompt;const opts=TITLE_PROMPTS.filter(x=>x!==old);titleDraft.prompt=opts[Math.floor(Math.random()*opts.length)]||'ふしぎな乗りもの';titleSaveDraft();$('titlePrompt').value=titleDraft.prompt};
+ if($('titlePromptCategory'))$('titlePromptCategory').onchange=e=>{titlePromptCategory=e.target.value;const top=$('featureBody').scrollTop;renderFeature();$('featureBody').scrollTop=top};
+ if($('titleRandom'))$('titleRandom').onclick=()=>{const old=titleDraft.prompt;const opts=titlePromptsInCategory().filter(x=>x!==old);titleSetPrompt(opts[Math.floor(Math.random()*opts.length)]||'空を泳ぐクジラ')};
+ for(const b of $('featureBody').querySelectorAll('[data-title-prompt-pick]'))b.onclick=()=>titleSetPrompt(b.dataset.titlePromptPick);
  for(const [id,key] of [['titlePrompt','prompt'],['titleMaker','maker'],['titleAuthorTitle','authorTitle']])if($(id))$(id).oninput=e=>{titleDraft[key]=e.target.value;titleSaveDraft()};
  if($('titleSource'))$('titleSource').onchange=e=>{titleDraft.source=e.target.value;titleSaveDraft();renderFeature()};
  if($('titleGoCanvas'))$('titleGoCanvas').onclick=()=>{if(relayState.work){alert('伝言ゲームのブロック制作を終えてから使ってください');return}titleDraft.source='current';titleDraft.working=true;titleSaveDraft();if(mode!=='free')showMode('free');closeFeature();titleUpdateWorkHint();toast('作品ができたら「作品をわたす」から続きをどうぞ')};
@@ -2656,6 +2694,8 @@ const RELAY_FORMAT='pitatorie-shape-relay',RELAY_STORE='pitatorie_relay_v1',RELA
 const RELAY_HOST_LIMIT=12,RELAY_INBOX_LIMIT=24,RELAY_ALBUM_LIMIT=12;
 let relayState={sessions:[],inbox:[],albums:[],work:null};
 let relayPage='host',relaySelected=null,relayAlbumIndex=0;
+// Unsaved host inputs survive switching tabs, without changing saved game data.
+let relayHostDraft={prompt:'',total:5,by:''};
 try{const x=JSON.parse(localStorage.getItem(RELAY_STORE)||'null');if(x&&Array.isArray(x.sessions)&&Array.isArray(x.inbox)&&Array.isArray(x.albums)){
  relayState={sessions:x.sessions.slice(-RELAY_HOST_LIMIT),inbox:x.inbox.slice(-RELAY_INBOX_LIMIT),albums:x.albums.slice(-RELAY_ALBUM_LIMIT),work:x.work&&typeof x.work==='object'?x.work:null};
 }}catch(_){}
@@ -2721,7 +2761,7 @@ function relayHostStart(){
   const session={id,total,steps:[{turn:1,kind:'word',text:prompt,by}],pending:null,createdAt:Date.now()};
   const before=relayState.sessions.slice();relayState.sessions.push(session);
   if(!relaySave()){relayState.sessions=before;return}
-  relaySelected='host:'+id;renderFeature();toast('伝言ゲームをはじめたよ。次の人に作品づくりをお願いしよう');
+  relayHostDraft={prompt:'',total:5,by:''};relaySelected='host:'+id;renderFeature();toast('伝言ゲームをはじめたよ。次の人に作品づくりをお願いしよう');
  }catch(e){alert(e.message)}
 }
 function relayHostNext(session){
@@ -2849,9 +2889,9 @@ function relayRenderHost(){
    (session.pending?'<p>第'+session.pending.turn+'ターンの返事を待っています。受け取った返事ファイルを下の「読み込む」から開いてください。</p>':'<p>次の人には直前の'+(last.kind==='word'?'お題だけ':'作品だけ')+'が届きます。</p>'))+'</div>';
  }
  return '<div class="title-card"><h3>① お題を決めて、ゲームを始める</h3><p>最初のお題を決める人が進行役です。参加者には直前の回答だけを渡します。</p><div class="title-fields">'+
- '<label>最初のお題<input id="relayPrompt" maxlength="40" placeholder="例：空飛ぶクジラ"></label><div class="title-actions"><button id="relayRandom" class="feature-action">お題をランダムに選ぶ</button></div>'+
- '<label>ターン数<select id="relayTotal"><option value="3">3ターン（短くお試し）</option><option value="5" selected>5ターン（おすすめ）</option><option value="7">7ターン</option><option value="9">9ターン</option></select></label>'+
- '<label>進行役の名前（任意）<input id="relayHostName" maxlength="24" placeholder="ニックネーム"></label></div>'+
+ '<label>最初のお題<input id="relayPrompt" maxlength="40" placeholder="例：しっぽがプロペラのネコ" value="'+esc(relayHostDraft.prompt)+'"></label>'+ '<div class="title-prompt-library"><div class="title-prompt-library-head"><span>伝言ゲーム専用のお題（全'+RELAY_PROMPTS.length+'題）</span><span>6ジャンル</span></div>'+ '<label>ジャンル<select id="relayPromptCategory" class="title-prompt-category">'+RELAY_PROMPT_CATEGORIES.map(c=>'<option value="'+esc(c)+'"'+(c===relayPromptCategory?' selected':'')+'>'+esc(c)+'（'+(c==='すべて'?RELAY_PROMPTS.length:RELAY_PROMPT_GROUPS[c].length)+'題）</option>').join('')+'</select></label>'+ '<div class="title-actions"><button type="button" id="relayRandom" class="feature-action">このジャンルからランダムに選ぶ</button></div>'+ '<details><summary id="relayPromptChoicesSummary">一覧から選ぶ（'+relayPromptsInCategory().length+'題）</summary><div class="title-prompt-choices" id="relayPromptChoices">'+relayPromptOptionsHtml()+'</div></details>'+ '</div><p>お題は自由に入力してもOK！ 次の人にはこのお題だけが渡され、その先では想像がつながっていきます。</p>'+
+ '<label>ターン数<select id="relayTotal">'+[[3,'3ターン（短くお試し）'],[5,'5ターン（おすすめ）'],[7,'7ターン'],[9,'9ターン']].map(([n,label])=>'<option value="'+n+'"'+(relayHostDraft.total===n?' selected':'')+'>'+label+'</option>').join('')+'</select></label>'+
+ '<label>進行役の名前（任意）<input id="relayHostName" maxlength="24" placeholder="ニックネーム" value="'+esc(relayHostDraft.by)+'"></label></div>'+
  '<div class="title-actions"><button id="relayStart" class="feature-cta">伝言ゲームをはじめる</button></div></div>'+
  '<div class="title-card"><h3>② 進行中・完成したゲーム</h3><div class="title-list">'+(relayState.sessions.slice().reverse().map(x=>
   '<div class="title-list-item"><strong>最初のお題：'+esc(x.steps[0].text)+'</strong><span class="muted">'+x.steps.length+' / '+x.total+' ターン'+(x.steps.length===x.total?' ・ 完成':' ・ 進行中')+'</span><div class="title-actions"><button data-relay-open-host="'+esc(x.id)+'" class="feature-action">'+(x.steps.length===x.total?'鑑賞する':'続きを進める')+'</button><button data-relay-delete="sessions:'+esc(x.id)+'" class="feature-action">削除</button></div></div>').join('')||'<div class="title-empty">まだゲームを始めていません。</div>')+'</div></div>';
@@ -2894,7 +2934,12 @@ function renderRelayFeature(){
  for(const b of $('featureBody').querySelectorAll('[data-relay-open-album]'))b.onclick=()=>{relayPage='albums';relaySelected='album:'+b.dataset.relayOpenAlbum;relayAlbumIndex=0;renderFeature()};
  for(const b of $('featureBody').querySelectorAll('[data-relay-delete]'))b.onclick=()=>{const [kind,id,turn]=b.dataset.relayDelete.split(':');relayForget(kind,id,Number(turn))};
  if($('relayBack'))$('relayBack').onclick=()=>{relaySelected=null;relayAlbumIndex=0;renderFeature()};
- if($('relayRandom'))$('relayRandom').onclick=()=>{$('relayPrompt').value=TITLE_PROMPTS[Math.floor(Math.random()*TITLE_PROMPTS.length)]||'ふしぎな乗りもの'};
+ if($('relayPromptCategory'))$('relayPromptCategory').onchange=e=>{relayPromptCategory=e.target.value;relayRefreshPromptChoices()};
+ if($('relayRandom'))$('relayRandom').onclick=()=>{const pool=relayPromptsInCategory();relayChoosePrompt(pool[Math.floor(Math.random()*pool.length)]||'しっぽがプロペラのネコ')};
+ if($('relayPrompt'))$('relayPrompt').oninput=e=>{relayHostDraft.prompt=e.target.value;relaySyncPromptPicks()};
+ if($('relayTotal'))$('relayTotal').onchange=e=>{relayHostDraft.total=Number(e.target.value)};
+ if($('relayHostName'))$('relayHostName').oninput=e=>{relayHostDraft.by=e.target.value};
+ if($('relayPromptChoices'))$('relayPromptChoices').onclick=e=>{const btn=e.target.closest('[data-relay-prompt-pick]');if(btn)relayChoosePrompt(btn.dataset.relayPromptPick)};
  if($('relayStart'))$('relayStart').onclick=relayHostStart;
  if($('relayExportTask'))$('relayExportTask').onclick=()=>{try{const s=relayState.sessions.find(x=>x.id===relaySelected.slice(5));if(s){const task=relayHostNext(s);if(task){relayDownload(task,'task');renderFeature();toast('つぎの人への依頼を保存したよ')}}}catch(e){alert(e.message)}};
  if($('relayExportAlbum'))$('relayExportAlbum').onclick=()=>{try{const s=relayState.sessions.find(x=>x.id===relaySelected.slice(5));relayDownload(relayHostExport(s),'album');toast('完成アルバムを書き出したよ')}catch(e){alert(e.message)}};
@@ -2988,8 +3033,8 @@ function renderHowto(){
    '<div class="howto-flow-grid">'+
    '<section class="howto-flow-card"><h3>'+iconHtml('book')+'ぬりえ交換</h3><p>形だけの作品を友だちに渡して、色をぬって返してもらう遊びです。</p>'+flow([["puzzle","作品をつくる"],["book","ファイルをわたす"],["palette","友だちがぬる"],["book","返してもらう"]])+'<button type="button" class="howto-main-action" data-howto-go="exchange">ぬりえ交換を開く</button></section>'+
    '<section class="howto-flow-card"><h3>'+iconHtml('book')+'ちいさな企画展</h3><p>自分や友だちの作品を選んで、額縁に入れた展示会を作れます。</p>'+flow([["book","作品をえらぶ"],["star","タイトルをつける"],["book","展示をならべる"],["camera","画像で保存"]])+'<button type="button" class="howto-main-action" data-howto-go="gallery">ちいさな企画展を開く</button></section>'+
-   '<section class="howto-flow-card"><h3>'+iconHtml('star')+'これなーんだ？</h3><p>作品を渡して、相手に「何に見えるか」を自由にタイトルで返してもらう遊びです。</p>'+flow([["puzzle","作品をつくる"],["book","相手にわたす"],["star","相手が名前をつける"],["book","感想を見る"]])+'<button type="button" class="howto-main-action" data-howto-go="title">これなーんだ？を開く</button></section>'+
-   '<section class="howto-flow-card"><h3>'+iconHtml('puzzle')+'かたちの伝言ゲーム</h3><p>「お題 → 作品 → タイトル」を順番につないでいく、連鎖型の遊びです。</p>'+flow([["bulb","お題"],["puzzle","ブロック作品"],["star","タイトル"],["book","次の人へ"],["book","最後にアルバム"]])+'<button type="button" class="howto-main-action" data-howto-go="relay">かたちの伝言ゲームを開く</button></section>'+
+   '<section class="howto-flow-card"><h3>'+iconHtml('star')+'これなーんだ？</h3><p>作品を渡して、何に見えるかタイトルをつけてもらう遊び。専用の120題からもお題を選べます。</p>'+flow([["puzzle","作品をつくる"],["book","相手にわたす"],["star","相手が名前をつける"],["book","感想を見る"]])+'<button type="button" class="howto-main-action" data-howto-go="title">これなーんだ？を開く</button></section>'+
+   '<section class="howto-flow-card"><h3>'+iconHtml('puzzle')+'かたちの伝言ゲーム</h3><p>150題からお題を選んで、「お題 → 作品 → タイトル」を順番につなぐ遊びです。最初のお題は自由入力もできます。</p>'+flow([["bulb","お題"],["puzzle","ブロック作品"],["star","タイトル"],["book","次の人へ"],["book","最後にアルバム"]])+'<button type="button" class="howto-main-action" data-howto-go="relay">かたちの伝言ゲームを開く</button></section>'+
    '</div>'+
    '<div class="howto-tip">'+iconHtml('bulb')+'「ぬりえ交換」「これなーんだ？」「かたちの伝言ゲーム」は、JSONファイルを相手に渡して遊びます。メッセージアプリや共有機能でファイルを送り合ってください。</div>';
  }else{
